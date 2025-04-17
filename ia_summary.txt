@@ -1,0 +1,68 @@
+Absolutely! Here's a **clean summary of your project setup**, ready to copy-paste into ChatGPT (or any AI) so it instantly understands your context and helps you efficiently.
+
+---
+
+## 🧾 **Project Summary for AI Context**
+
+I’m building a **cross-platform GUI desktop app for RoboCup SSL**, using:
+
+### 🧱 Tech Stack:
+- **Frontend**: React + TypeScript + Vite
+- **Desktop App**: Electron
+- **Real-time communication**: WebSocket (from a Qt6 C++ backend)
+- **Data rate**: Every 16ms, backend sends JSON packets
+- **Goal**: Render robot and ball states on a field in real-time
+
+### 🔄 WebSocket Data Format (from backend):
+
+```json
+{
+  "robots": [
+    {
+      "id": 1,
+      "team": "blue",
+      "position": { "x": 0.5, "y": 0.4 },
+      "velocity": { "x": 0.1, "y": 0.2 },
+      "orientation": 1.57
+    }
+    // Up to 22 robots
+  ],
+  "ball": {
+    "position": { "x": 0.9, "y": 0.3 },
+    "velocity": { "x": 0.03, "y": 0.01 },
+    "orientation": 0.0
+  }
+}
+```
+
+### 🧠 Functional Goals:
+- Open the GUI **in a native desktop window** (not in a browser)
+- Render the field using **SVG or Canvas**
+- Show robots with color by team, ID labels, orientation (arrow), and velocity (vector)
+- Ball position and movement
+- Future: switch to FlatBuffers or binary if JSON slows down
+
+---
+
+### ✅ My Stack Is Ready
+
+I’ve already:
+- Set up **Electron + Vite + React + TypeScript**
+- Installed WebSocket client
+- Connected to the backend (localhost:9001)
+
+---
+
+### ❓What I Want from You (AI):
+Examples or help with:
+- SVG or Canvas-based robot + ball field rendering
+- Managing state updates from WebSocket cleanly
+- Packaging into `.AppImage` or `.deb` for Ubuntu
+- Optimizations or animations
+- UI components (like toggles, team filters, FPS display)
+
+---
+
+Feel free to use this summary whenever you’re asking for help on your project. It gives the next AI or teammate everything they need to hit the ground running 💥
+
+Want me to generate the full folder structure and key files as one compressed snippet you can paste into your project too?
