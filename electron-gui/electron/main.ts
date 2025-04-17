@@ -5,7 +5,7 @@ function createWindow() {
   const win = new BrowserWindow({
     width: 800,
     height: 600,
-    resizable: false,        // ✅ Prevents resizing
+    resizable: true,        // ✅ Prevents resizing
     autoHideMenuBar: true, // ✅ Hides the menu bar,
     title: "CondorSSL", // ✅ Set title here
     webPreferences: {

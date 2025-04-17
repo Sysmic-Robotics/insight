@@ -7,103 +7,51 @@ import { Splash } from "./components/Splash";
 import { useConnectionStatus } from "./hooks/useConnectionStatus";
 import { useRobotData } from "./hooks/useRobotData";
 import { BackendSocketProvider } from "./context/BackendSocketContext";
+import { Theme } from '@radix-ui/themes';
+import '@radix-ui/themes/styles.css'; // <- must be included!
 
 function InnerApp() {
   const connected = useConnectionStatus();
   const { robots, ball, updateTimeUs } = useRobotData();
 
-  // Test logs for terminal
   const [logs] = useState<string[]>(
     Array.from({ length: 50 }, (_, i) => `[Lua] Log message ${i + 1}`)
   );
 
   return (
-    <div style={{ height: "100vh", display: "flex", overflow: "hidden" }}>
-      {/* Sidebar */}
-      <div
-        style={{
-          width: "300px",
-          backgroundColor: "crimson", // 🟥 Sidebar
-        }}
-      />
-
-      {/* Main content area */}
-      <div
-        style={{
-          flexGrow: 1,
-          display: "flex",
-          flexDirection: "column",
-          overflow: "hidden",
-          backgroundColor: "#111", // main column bg
-        }}
-      >
-        {/* Topbar (fixed height) */}
-        <div
-          style={{
-            height: "40px",
-            backgroundColor: "royalblue", // 🟦 Topbar
-          }}
-        />
-
-        {/* Field (flexes to fill) */}
-        <div
-          style={{
-            flexGrow: 1,
-            backgroundColor: "limegreen", // 🟩 Field
-          }}
-        />
-
-        {/* Terminal (fixed height) */}
-        <div
-          style={{
-            height: "160px",
-            backgroundColor: "black", // ⬛ Terminal
-          }}
-        />
+    <div
+      style={{
+        display: "grid",
+        gridTemplateRows: "30px 1fr 160px",         // Topbar and Terminal fixed, Field flexible
+        overflow: "hidden",
+        backgroundColor: "white",
+      }}
+    >
+      {/* Sidebar (spans all rows) */}
+      <div style={{ gridRow: "1 / span 3", gridColumn: "1", overflow: "hidden" }}>
+        <Sidebar robots={robots} />
       </div>
-    </div>
-  );
 
+      {/* Topbar */}
+      <div style={{ gridRow: "1", gridColumn: "2" }}>
+        <Topbar connected={connected} updateTimeUs={updateTimeUs} />
+      </div>
 
-  return (
-    <div style={{ height: "100vh", display: "flex", overflow: "hidden" }}>
-      {/* Sidebar (fixed width) */}
-      <Sidebar robots={robots} />
-
-      {/* Main content area (fills remaining space) */}
+      {/* Field */}
       <div
         style={{
-          flexGrow: 1,
-          display: "flex",
-          flexDirection: "column",
+          gridRow: "2",
+          gridColumn: "2",
+          position: "relative",
           overflow: "hidden",
         }}
       >
-        {/* Topbar at top of right column */}
-        <div style={{ height: "40px", position: "relative" }}>
-          <Topbar connected={connected} updateTimeUs={updateTimeUs} />
-        </div>
+        <Field robots={robots} ball={ball} />
+      </div>
 
-        {/* Field and terminal split the rest vertically */}
-        <div
-          style={{
-            flexGrow: 1,
-            display: "flex",
-            flexDirection: "column",
-            overflow: "hidden",
-            width: "100%",
-          }}
-        >
-          {/* Field fills available vertical space */}
-          <div style={{ flexGrow: 1, position: "relative", overflow: "hidden" }}>
-            <Field robots={robots} ball={ball} />
-          </div>
-
-          {/* TerminalPanel fixed height */}
-          <div style={{ height: "160px", width: "100%" }}>
-            <TerminalPanel logs={logs} />
-          </div>
-        </div>
+      {/* TerminalPanel */}
+      <div style={{ gridRow: "3", gridColumn: "2", overflow: "hidden" }}>
+        <TerminalPanel logs={logs} />
       </div>
     </div>
   );
@@ -111,12 +59,12 @@ function InnerApp() {
 
 function App() {
   const [showSplash, setShowSplash] = useState(true);
-
   return (
-    <BackendSocketProvider>
-      <InnerApp />
-      {showSplash && <Splash onFinish={() => setShowSplash(false)} />}
-    </BackendSocketProvider>
+    <Theme appearance="light">
+      <BackendSocketProvider>
+        <InnerApp />
+      </BackendSocketProvider>
+    </Theme>
   );
 }
 

@@ -1,107 +1,80 @@
-import React, { useRef, useState } from "react";
-import { useButton } from "react-aria";
+import React, { useState } from "react";
+import { Button, IconButton, Flex, Text } from "@radix-ui/themes";
+import { PlayIcon, PauseIcon, ReloadIcon } from "@radix-ui/react-icons";
 import { useBackendSocketContext } from "../context/BackendSocketContext";
 
 export const ScriptPanel: React.FC = () => {
   const { socket } = useBackendSocketContext();
   const [state, setState] = useState<"idle" | "running" | "paused">("idle");
 
-  const handleClick = () => {
-    if (state === "idle" || state === "running") {
-      console.log("▶️ Running script...");
-
-      if (socket && socket.readyState === WebSocket.OPEN) {
-        const message = {
-          type: "runScript"
-        };
-        socket.send(JSON.stringify(message));
-        console.log("Sent runScript message:", message);
-      } else {
-        console.warn("WebSocket is not connected.");
-      }
-
-      setState("running");
-    } else if (state === "running") {
-      console.log("⏸️ Pausing script...");
-      setState("paused");
-    } else if (state === "paused") {
-      console.log("▶️ Resuming script...");
-      setState("running");
+  const sendSocketMessage = (message: object) => {
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      socket.send(JSON.stringify(message));
+      console.log("Sent message:", message);
+    } else {
+      console.warn("WebSocket is not connected.");
     }
   };
 
-  return (
-    <div style={{ marginTop: "2rem" }}>
-      <h2 style={{ marginBottom: "1rem" }}>Script Control</h2>
-      <ScriptButton onClick={handleClick} state={state} />
-    </div>
-  );
-};
+  const handlePlayPauseClick = () => {
+    if (state === "idle" || state === "paused") {
+      sendSocketMessage({ type: "runScript" });
+      setState("running");
+    } else if (state === "running") {
+      sendSocketMessage({ type: "pauseScript" });
+      setState("paused");
+    }
+  };
 
-function ScriptButton({
-  onClick,
-  state,
-}: {
-  onClick: () => void;
-  state: "idle" | "running" | "paused";
-}) {
-  const ref = useRef(null);
-  const { buttonProps } = useButton({ onPress: onClick }, ref);
-
-  let label = "Run Script";
-  if (state === "running") label = "Running...";
-  if (state === "paused") label = "Paused";
-
-  const getColor = () => {
-    if (state === "idle") return "#2e7d32";
-    if (state === "running") return "#1976d2";
-    if (state === "paused") return "#f9a825";
+  const handleUpdateClick = () => {
+    sendSocketMessage({ type: "updateScript" });
   };
 
   return (
-    <button
-      {...buttonProps}
-      ref={ref}
-      style={{
-        width: "100%",
-        padding: "0.75rem",
-        fontSize: "1rem",
-        fontWeight: "bold",
-        background: getColor(),
-        color: "#fff",
-        border: "none",
-        borderRadius: "6px",
-        cursor: "pointer",
-        position: "relative",
-        transition: "background 0.3s",
-      }}
-    >
-      {state === "running" && (
-        <span
-          className="spinner"
-          style={{
-            position: "absolute",
-            left: "12px",
-            top: "50%",
-            transform: "translateY(-50%)",
-            width: "14px",
-            height: "14px",
-            border: "2px solid #fff",
-            borderTopColor: "transparent",
-            borderRadius: "50%",
-            animation: "spin 1s linear infinite",
-          }}
-        />
-      )}
-      {label}
+    <div style={{ width: "100%", marginTop: "1rem" }}>
+      <Text as="h3" size="3" weight="bold" mb="2">
+        Script Control
+      </Text>
+
+      <Flex gap="2" align="center">
+        <IconButton
+          variant="solid"
+          color="gray"
+          radius="none"
+          onClick={handlePlayPauseClick}
+          title={state === "running" ? "Pause Script" : "Run Script"}
+          style={
+            state === "running"
+              ? {
+                  animation: "blink 1s linear infinite",
+                  outline: "none",
+                }
+              : { outline: "none" }
+          }
+        >
+          {state === "running" ? <PauseIcon /> : <PlayIcon />}
+        </IconButton>
+
+        <Button
+          variant="solid"
+          color="gray"
+          radius="none"
+          onClick={handleUpdateClick}
+          style={{ flexGrow: 1, outline: "none" }}
+        >
+          <ReloadIcon />
+          Update Script
+        </Button>
+      </Flex>
+
       <style>
         {`
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
+          @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+          }
         `}
       </style>
-    </button>
+    </div>
   );
-}
+};

@@ -24,6 +24,7 @@ export const TerminalPanel: React.FC<{ logs: string[] }> = ({ logs }) => {
         overflowY: "auto",
         borderTop: "1px solid #333",
         whiteSpace: "pre-wrap",
+        boxSizing: "border-box", // 🛠️ key to avoid overflow from padding
       }}
     >
       {logs.map((line, idx) => (

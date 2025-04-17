@@ -1,35 +1,61 @@
 import React from "react";
+import { Flex, Text, Box } from "@radix-ui/themes";
+import { GearIcon, TimerIcon } from "@radix-ui/react-icons";
 
 export const Topbar: React.FC<{ connected: boolean; updateTimeUs?: number }> = ({
   connected,
   updateTimeUs,
 }) => {
   const updateTimeMs =
-  updateTimeUs !== undefined ? (updateTimeUs / 1000).toFixed(2) : "—";
+    updateTimeUs !== undefined ? (updateTimeUs / 1000).toFixed(2) : "—";
+
   return (
-    <div
+    <Box
+      px="4"
       style={{
-        height: "40px",
-        width: "95%",
-        position: "absolute",
-        top: 0,
-        left: 0,
-        backgroundColor: "#1f1f1f",
-        color: connected ? "#4caf50" : "#f44336",
-        padding: "0 1rem",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "flex-end",
-        fontWeight: "bold",
-        fontSize: "0.9rem",
-        borderBottom: "1px solid #333",
+        height: "30px",
+        width: "100%",
+        backgroundColor: "var(--gray-12)",
+        color: "white",
         zIndex: 10,
       }}
     >
-      ⚙️ Engine Status: {connected ? "Connected" : "Disconnected"}
-      <span style={{ marginLeft: "1.5rem", color: "#aaa" }}>
-        ⏱ Update: {updateTimeMs} ms
-      </span>
-    </div>
+      <Flex
+        align="center"
+        justify="end"
+        height="100%"
+        gap="5"
+      >
+        {/* Engine status */}
+        <Flex align="center" gap="2">
+          <GearIcon />
+          <Text
+            size="2"
+            color={connected ? "green" : "red"}
+            weight="medium"
+          >
+            {connected ? "Connected" : "Disconnected"}
+          </Text>
+        </Flex>
+
+        {/* Update time */}
+        <Flex align="center" gap="2">
+          <TimerIcon />
+          <Text
+  size="2"
+  weight="medium"
+  style={{
+    minWidth: "64px", // enough space for "9999.99"
+    paddingInline: "4px", // ⬅️ smooths out edge compression
+    textAlign: "right",
+    fontVariantNumeric: "tabular-nums",
+    whiteSpace: "nowrap", // ⬅️ prevents accidental wrapping
+  }}
+>
+  {updateTimeMs} ms
+</Text>
+        </Flex>
+      </Flex>
+    </Box>
   );
 };
