@@ -1,54 +1,107 @@
-# React + TypeScript + Vite
+# 🛰️ CondorSSL - Electron GUI
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Interfaz gráfica para CondorSSL, desarrollada con **Electron**, **React**, **Vite** y **TailwindCSS**.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 📦 Requisitos
 
-## Expanding the ESLint configuration
+- Node.js >= 18
+- npm >= 9
+- Git
+- (Windows) Para ejecutar el backend: `SysmicSoftware.exe` debe estar disponible
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## 🧱 Estructura del proyecto
+
+```
+electron-gui/
+├── electron/            # Lógica principal de Electron (main.ts)
+├── src/                 # Código React + Tailwind
+├── dist/                # Build frontend de Vite
+├── dist-electron/       # Archivos JS compilados de Electron (main + preload)
+├── preload.ts           # Script seguro de comunicación entre renderer y main
+├── vite.config.ts       # Configuración de Vite
+├── tsconfig.json        # Configuración de TypeScript
+├── package.json         # Scripts, dependencias y config de build
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 🚀 Scripts de desarrollo
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+| Comando                  | Descripción                                      |
+|--------------------------|--------------------------------------------------|
+| `npm install`            | Instala todas las dependencias                  |
+| `npm run dev`            | Inicia Vite + Electron en modo desarrollo       |
+| `npm run build`          | Genera el build del frontend (Vite)             |
+| `npm run build-electron` | Compila los archivos TypeScript de Electron     |
+| `npm run dist`           | Crea el `.exe` instalable con Electron Builder  |
+| `npm run lint`           | Lint con ESLint                                 |
+| `npm run preview`        | Previsualiza el frontend generado por Vite      |
+
+---
+
+## 🧪 Desarrollo local
+
+1. Clonar el repositorio:
+   ```bash
+   git clone https://github.com/tu_usuario/electron-gui.git
+   cd electron-gui
+   ```
+
+2. Instalar dependencias:
+   ```bash
+   npm install
+   ```
+
+3. Ejecutar en modo desarrollo:
+   ```bash
+   npm run dev
+   ```
+
+> Esto iniciará Vite (`localhost:5173`) y abrirá una ventana de Electron con hot reload.
+
+---
+
+## 🛠️ Compilación para producción
+
+1. Generar build del frontend:
+   ```bash
+   npm run build
+   ```
+
+2. Compilar los scripts de Electron:
+   ```bash
+   npm run build-electron
+   ```
+
+3. Generar instalador para Windows:
+   ```bash
+   npm run dist
+   ```
+
+> El instalador final se guardará en `release/`.
+
+---
+
+## 🧩 Notas
+
+- El backend `SysmicSoftware.exe` no se incluye por defecto. Asegúrate de tenerlo si es necesario.
+- Por ahora, la comunicación con el backend está deshabilitada, pero puede habilitarse vía IPC cuando se necesite.
+- Los estilos se manejan completamente con TailwindCSS.
+- Los íconos vienen de `@radix-ui/react-icons`.
+
+---
+
+## 👤 Autor
+
+**GersonHMG**  
+GitHub: [@GersonHMG](https://github.com/GersonHMG)
+
+---
+
+## 📄 Licencia
+
+Este proyecto es privado o de uso interno. Asegúrate de contar con autorización antes de distribuir.
