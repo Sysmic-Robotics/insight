@@ -1,14 +1,33 @@
 {
   "name": "electron-gui",
+  "author":"GersonHMG",
   "private": true,
   "version": "0.0.0",
   "main": "electron/index.cjs",
   "scripts": {
     "dev": "concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
     "build": "vite build",
+    "build-electron": "tsc",
     "start": "electron .",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "electron": "electron .",
+    "dist": "electron-builder"
+  },
+  "build": {
+    "appId": "com.SysmicRobotics.CondorSSL",
+    "productName": "CondorSSL",
+    "files": [
+    "dist/**/*",
+    "electron/**/*",
+    "dist-electron/**/*"     
+    ],
+    "directories": {
+      "output": "release"
+    },
+    "win": {
+      "target": "nsis"
+    }
   },
   "dependencies": {
     "@radix-ui/react-icons": "^1.3.2",
@@ -30,6 +49,7 @@
     "@vitejs/plugin-react": "^4.3.4",
     "concurrently": "^9.1.2",
     "electron": "^35.1.5",
+    "electron-builder": "^26.0.12",
     "eslint": "^9.22.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.19",

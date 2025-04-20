@@ -1,7 +1,18 @@
 {
-  "files": [],
-  "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
-  ]
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "CommonJS",
+    "lib": ["ES2020", "DOM"],
+    "outDir": "dist-electron",
+    "rootDir": "electron",
+    "strict": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "noImplicitAny": false
+  },
+  "include": ["electron", "preload.ts"]
 }

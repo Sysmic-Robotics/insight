@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Sidebar } from "./components/Sidebar";
 import { Field } from "./components/Field";
-import { Topbar } from "./components/Topbar";
+import { Topbar } from "./components/TopBar";
 import { TerminalPanel } from "./components/TerminalPanel";
 import { Splash } from "./components/Splash";
 import { useConnectionStatus } from "./hooks/useConnectionStatus";
@@ -18,6 +18,19 @@ function InnerApp() {
     Array.from({ length: 50 }, (_, i) => `[Lua] Log message ${i + 1}`)
   );
 
+  /*
+  const handleStart = () => {
+    console.log("🟡 Button clicked — attempting to start backend...");
+   // window.electron.ipcRenderer.startBackend()
+      .then(() => {
+        console.log("🟢 Backend started.");
+      })
+      .catch((err) => {
+        console.error("🔴 Failed to start backend:", err);
+      });
+  };
+  */
+
   return (
     <div
       style={{
@@ -27,6 +40,10 @@ function InnerApp() {
         backgroundColor: "white",
       }}
     >
+
+      {/* Place this somewhere in the layout temporarily, like in the Topbar or below it */}
+
+
       {/* Sidebar (spans all rows) */}
       <div style={{ gridRow: "1 / span 3", gridColumn: "1", overflow: "hidden" }}>
         <Sidebar robots={robots} />
