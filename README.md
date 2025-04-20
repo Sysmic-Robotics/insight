@@ -67,7 +67,7 @@ El instalador `.exe` se generará en la carpeta `release/`.
 
 <p align="center">
   <a href="https://github.com/GersonHMG/frontend_prototype/graphs/contributors">
-    <img src="https://contrib.rocks/image?repo=GersonHMG/condorssl" />
+    <img src="https://contrib.rocks/image?repo=GersonHMG/frontend_prototype" />
   </a>
 </p>
 
