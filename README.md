@@ -1,107 +1,77 @@
-# 🛰️ CondorSSL - Electron GUI
 
-Interfaz gráfica para CondorSSL, desarrollada con **Electron**, **React**, **Vite** y **TailwindCSS**.
+<p align="center">
+  <img src="https://cdn-icons-png.flaticon.com/512/3187/3187558.png" alt="CondorSSL Logo" width="180"/>
+</p>
+
+<h1 align="center">CondorSSL</h1>
+
+<p align="center">
+  <a href="https://github.com/GersonHMG/frontend_prototype/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/GersonHMG/frontend_prototype" alt="License">
+  </a>
+  <a href="https://img.shields.io/github/package-json/v/GersonHMG/frontend_prototype">
+    <img src="https://img.shields.io/github/package-json/v/GersonHMG/frontend_prototype" alt="Version">
+  </a>
+</p>
+
+<p align="center">
+  CondorSSL es una aplicación de escritorio desarrollada con Electron, React y Vite, diseñada para ofrecer una interfaz moderna y fluida para el control y gestión del engine de Sysmic Robotics.
+</p>
+
 
 ---
 
-## 📦 Requisitos
+## 🧩 Tabla de Contenidos
 
-- Node.js >= 18
-- npm >= 9
-- Git
-- (Windows) Para ejecutar el backend: `SysmicSoftware.exe` debe estar disponible
+- [Instalación](#instalación)
+- [Uso en desarrollo](#uso-en-desarrollo)
+- [Compilación para producción](#compilación-para-producción)
+- [Colaboradores](#colaboradores)
+- [Licencia](#licencia)
 
 ---
 
-## 🧱 Estructura del proyecto
 
+## 📥 Instalación
+
+```bash
+git clone https://github.com/GersonHMG/condorssl.git
+cd condorssl
+npm install
 ```
-electron-gui/
-├── electron/            # Lógica principal de Electron (main.ts)
-├── src/                 # Código React + Tailwind
-├── dist/                # Build frontend de Vite
-├── dist-electron/       # Archivos JS compilados de Electron (main + preload)
-├── preload.ts           # Script seguro de comunicación entre renderer y main
-├── vite.config.ts       # Configuración de Vite
-├── tsconfig.json        # Configuración de TypeScript
-├── package.json         # Scripts, dependencias y config de build
+
+
+## 🛠️ Uso en Desarrollo
+
+```bash
+npm run dev
 ```
 
----
+Esto lanza:
+- Un servidor Vite en `localhost:5173`
+- Una instancia de Electron cargando la app en vivo
 
-## 🚀 Scripts de desarrollo
 
-| Comando                  | Descripción                                      |
-|--------------------------|--------------------------------------------------|
-| `npm install`            | Instala todas las dependencias                  |
-| `npm run dev`            | Inicia Vite + Electron en modo desarrollo       |
-| `npm run build`          | Genera el build del frontend (Vite)             |
-| `npm run build-electron` | Compila los archivos TypeScript de Electron     |
-| `npm run dist`           | Crea el `.exe` instalable con Electron Builder  |
-| `npm run lint`           | Lint con ESLint                                 |
-| `npm run preview`        | Previsualiza el frontend generado por Vite      |
+## 🏗️ Compilación para Producción
 
----
+```bash
+npm run build
+npm run build-electron
+npm run dist
+```
 
-## 🧪 Desarrollo local
+El instalador `.exe` se generará en la carpeta `release/`.
 
-1. Clonar el repositorio:
-   ```bash
-   git clone https://github.com/tu_usuario/electron-gui.git
-   cd electron-gui
-   ```
 
-2. Instalar dependencias:
-   ```bash
-   npm install
-   ```
+## 👥 Principales colaboradores
 
-3. Ejecutar en modo desarrollo:
-   ```bash
-   npm run dev
-   ```
+<p align="center">
+  <a href="https://github.com/GersonHMG/frontend_prototype/graphs/contributors">
+    <img src="https://contrib.rocks/image?repo=GersonHMG/condorssl" />
+  </a>
+</p>
 
-> Esto iniciará Vite (`localhost:5173`) y abrirá una ventana de Electron con hot reload.
-
----
-
-## 🛠️ Compilación para producción
-
-1. Generar build del frontend:
-   ```bash
-   npm run build
-   ```
-
-2. Compilar los scripts de Electron:
-   ```bash
-   npm run build-electron
-   ```
-
-3. Generar instalador para Windows:
-   ```bash
-   npm run dist
-   ```
-
-> El instalador final se guardará en `release/`.
-
----
-
-## 🧩 Notas
-
-- El backend `SysmicSoftware.exe` no se incluye por defecto. Asegúrate de tenerlo si es necesario.
-- Por ahora, la comunicación con el backend está deshabilitada, pero puede habilitarse vía IPC cuando se necesite.
-- Los estilos se manejan completamente con TailwindCSS.
-- Los íconos vienen de `@radix-ui/react-icons`.
-
----
-
-## 👤 Autor
-
-**GersonHMG**  
-GitHub: [@GersonHMG](https://github.com/GersonHMG)
-
----
 
 ## 📄 Licencia
 
-Este proyecto es privado o de uso interno. Asegúrate de contar con autorización antes de distribuir.
+Este proyecto está licenciado bajo los términos de la [MIT License](LICENSE).
