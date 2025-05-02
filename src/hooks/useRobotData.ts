@@ -20,7 +20,7 @@ export type Ball = {
 export function useRobotData() {
   const [robots, setRobots] = useState<Robot[]>([]);
   const [ball, setBall] = useState<Ball | null>(null);
-  const [updateTimeUs, setUpdateTimeUs] = useState<number | null>(null);
+  const [updateTimeUs, setUpdateTimeUs] = useState<number | undefined>();
   const { socket } = useBackendSocketContext();
 
   useEffect(() => {

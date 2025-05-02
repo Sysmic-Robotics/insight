@@ -77,4 +77,38 @@ electron_1.ipcMain.handle("open-lua-file", async () => {
 electron_1.ipcMain.handle("save-lua-file-to-path", async (_event, filePath, content) => {
     fs.writeFileSync(filePath, content, "utf-8");
 });
+function readFolderRecursive(dir) {
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    return entries.map((entry) => {
+        const fullPath = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+            return {
+                name: entry.name,
+                type: "folder",
+                path: fullPath,
+                children: readFolderRecursive(fullPath)
+            };
+        }
+        else if (entry.isFile() && entry.name.endsWith(".lua")) {
+            return {
+                name: entry.name,
+                type: "file",
+                path: fullPath
+            };
+        }
+    }).filter(Boolean);
+}
+electron_1.ipcMain.handle("select-lua-folder", async () => {
+    const { canceled, filePaths } = await electron_1.dialog.showOpenDialog({
+        properties: ["openDirectory"]
+    });
+    if (canceled || filePaths.length === 0)
+        return [];
+    const tree = readFolderRecursive(filePaths[0]);
+    return tree;
+});
+electron_1.ipcMain.handle("read-lua-file", async (_e, filePath) => {
+    const content = fs.readFileSync(filePath, "utf-8");
+    return { content, path: filePath };
+});
 //# sourceMappingURL=main.js.map
