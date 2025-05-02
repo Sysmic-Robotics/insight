@@ -69,10 +69,10 @@ function RobotInfo({ robot }: { robot: Robot }) {
       <Flex direction="column" gap="3">
         {/* Header */}
         <Flex align="center" justify="between">
-          <Text as="h3" size="3" weight="bold">
+          <Text as="h3" size="3" weight="bold" color="blue">
             🤖 Robot #{robot.id}
           </Text>
-          <Text size="1" color="gray">
+          <Text size="1" color="blue">
             Team: <Text as="span">{robot.team}</Text>
           </Text>
         </Flex>
@@ -82,22 +82,22 @@ function RobotInfo({ robot }: { robot: Robot }) {
         {/* Stat Grid */}
         <Grid columns="2" gap="3">
           <Flex direction="column" gap="1">
-            <Text size="1" color="gray">Position</Text>
-            <Text size="2">
+            <Text size="1" color="blue">Position</Text>
+            <Text size="2" color="blue">
               ({robot.position.x.toFixed(2)}, {robot.position.y.toFixed(2)})
             </Text>
           </Flex>
 
           <Flex direction="column" gap="1">
-            <Text size="1" color="gray">Velocity</Text>
-            <Text size="2">
+            <Text size="1" color="blue">Velocity</Text>
+            <Text size="2" color="blue">
               ({robot.velocity.x.toFixed(2)}, {robot.velocity.y.toFixed(2)})
             </Text>
           </Flex>
 
           <Flex direction="column" gap="1">
-            <Text size="1" color="gray">Orientation</Text>
-            <Text size="2">{robot.orientation.toFixed(2)}</Text>
+            <Text size="1" color="blue">Orientation</Text>
+            <Text size="2" color="blue">{robot.orientation.toFixed(2)}</Text>
           </Flex>
         </Grid>
       </Flex>

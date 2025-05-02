@@ -16,7 +16,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ robots }) => {
       width="280px"
       height="100vh"
       style={{
-        backgroundColor: "var(--gray-12)", // Dark background
+        backgroundColor: "var(--gray-6)", // Dark background
         color: "var(--gray-1)",            // Light text
         boxSizing: "border-box",
       }}
