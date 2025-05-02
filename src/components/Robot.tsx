@@ -13,48 +13,24 @@ const FIELD_HEIGHT = 7.4;
 export const Robot: React.FC<RobotProps> = ({ id, team, position, orientation }) => {
   const fieldCenter = { x: FIELD_WIDTH / 2, y: FIELD_HEIGHT / 2 };
 
-  const radius = 0.09; // robot radius in meters
-  const arrowLength = radius;
+  const robotSize = 0.18; // size of image in meters (same as diameter of circle)
+  const halfSize = robotSize / 2;
 
   const x = fieldCenter.x + position.x;
-  const y = fieldCenter.y - position.y; // Y axis is flipped in SVG
+  const y = fieldCenter.y - position.y; // flip Y for SVG
 
-  const endX = x + arrowLength * Math.cos(orientation);
-  const endY = y - arrowLength * Math.sin(orientation); // flip Y again
+  const imageHref = `/robots/robot_${id}_${team}.png`;
 
   return (
-    <g>
-      {/* Robot body */}
-      <circle
-        cx={x}
-        cy={y}
-        r={radius}
-        fill={team === "blue" ? "#4848f2" : "#f6edc3"}
-        stroke="black"
-        strokeWidth={0.02}
+    <g transform={`rotate(${-orientation * (180 / Math.PI)}, ${x}, ${y})`}>
+      <image
+        href={imageHref}
+        x={x - halfSize}
+        y={y - halfSize}
+        width={robotSize}
+        height={robotSize}
+        preserveAspectRatio="xMidYMid slice"
       />
-
-      {/* Orientation arrow */}
-      <line
-        x1={x}
-        y1={y}
-        x2={endX}
-        y2={endY}
-        stroke="black"
-        strokeWidth={0.02}
-      />
-
-      {/* Optional: ID label */}
-      <text
-        x={x}
-        y={y + 0.05}
-        textAnchor="middle"
-        fill="black"
-        fontSize={0.2}
-        pointerEvents="none"
-      >
-        {id}
-      </text>
     </g>
   );
 };
