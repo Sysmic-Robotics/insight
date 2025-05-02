@@ -3,48 +3,29 @@ import { Sidebar } from "./components/Sidebar";
 import { Field } from "./components/Field";
 import { Topbar } from "./components/TopBar";
 import { TerminalPanel } from "./components/TerminalPanel";
-import { Splash } from "./components/Splash";
-import { useConnectionStatus } from "./hooks/useConnectionStatus";
 import { useRobotData } from "./hooks/useRobotData";
-import { BackendSocketProvider } from "./context/BackendSocketContext";
+import { BackendSocketProvider, useBackendSocketContext } from "./context/BackendSocketContext";
 import { Theme } from '@radix-ui/themes';
-import '@radix-ui/themes/styles.css'; // <- must be included!
+import '@radix-ui/themes/styles.css';
 
 function InnerApp() {
-  const connected = useConnectionStatus();
+  const { connected } = useBackendSocketContext(); // ✅ Use socket context instead of useConnectionStatus
   const { robots, ball, updateTimeUs } = useRobotData();
 
   const [logs] = useState<string[]>(
     Array.from({ length: 50 }, (_, i) => `[Lua] Log message ${i + 1}`)
   );
 
-  /*
-  const handleStart = () => {
-    console.log("🟡 Button clicked — attempting to start backend...");
-   // window.electron.ipcRenderer.startBackend()
-      .then(() => {
-        console.log("🟢 Backend started.");
-      })
-      .catch((err) => {
-        console.error("🔴 Failed to start backend:", err);
-      });
-  };
-  */
-
   return (
     <div
       style={{
         display: "grid",
-        gridTemplateRows: "30px 1fr 160px",         // Topbar and Terminal fixed, Field flexible
+        gridTemplateRows: "30px 1fr 160px",
         overflow: "hidden",
         backgroundColor: "white",
       }}
     >
-
-      {/* Place this somewhere in the layout temporarily, like in the Topbar or below it */}
-
-
-      {/* Sidebar (spans all rows) */}
+      {/* Sidebar */}
       <div style={{ gridRow: "1 / span 3", gridColumn: "1", overflow: "hidden" }}>
         <Sidebar robots={robots} />
       </div>
@@ -63,7 +44,7 @@ function InnerApp() {
           overflow: "hidden",
         }}
       >
-        <Field robots={robots} ball={ball} />
+       <Field robots={robots} ball={ball} />
       </div>
 
       {/* TerminalPanel */}
@@ -76,6 +57,7 @@ function InnerApp() {
 
 function App() {
   const [showSplash, setShowSplash] = useState(true);
+
   return (
     <Theme appearance="light">
       <BackendSocketProvider>

@@ -1,11 +1,14 @@
 import React from "react";
-import { Flex, Text, Box } from "@radix-ui/themes";
-import { GearIcon, TimerIcon } from "@radix-ui/react-icons";
+import { Flex, Text, Box, Button } from "@radix-ui/themes";
+import { GearIcon, TimerIcon, RocketIcon } from "@radix-ui/react-icons";
+import { useBackendSocketContext } from "../context/BackendSocketContext"; // adjust path
 
 export const Topbar: React.FC<{ connected: boolean; updateTimeUs?: number }> = ({
   connected,
   updateTimeUs,
 }) => {
+  const { connect } = useBackendSocketContext(); // ✅ from context
+
   const updateTimeMs =
     updateTimeUs !== undefined ? (updateTimeUs / 1000).toFixed(2) : "—";
 
@@ -20,40 +23,42 @@ export const Topbar: React.FC<{ connected: boolean; updateTimeUs?: number }> = (
         zIndex: 10,
       }}
     >
-      <Flex
-        align="center"
-        justify="end"
-        height="100%"
-        gap="5"
-      >
-        {/* Engine status */}
+      <Flex align="center" justify="end" height="100%" gap="5">
         <Flex align="center" gap="2">
           <GearIcon />
-          <Text
-            size="2"
-            color={connected ? "green" : "red"}
-            weight="medium"
-          >
+          <Text size="2" color={connected ? "green" : "red"} weight="medium">
             {connected ? "Connected" : "Disconnected"}
           </Text>
+
+          {!connected && (
+            <Button
+              variant="solid"
+              size="1"
+              color="blue"
+              onClick={connect} // ✅ now using WebSocket connect
+              style={{ marginLeft: "8px", height: "24px" }}
+            >
+              <RocketIcon />
+              Connect
+            </Button>
+          )}
         </Flex>
 
-        {/* Update time */}
         <Flex align="center" gap="2">
           <TimerIcon />
           <Text
-  size="2"
-  weight="medium"
-  style={{
-    minWidth: "64px", // enough space for "9999.99"
-    paddingInline: "4px", // ⬅️ smooths out edge compression
-    textAlign: "right",
-    fontVariantNumeric: "tabular-nums",
-    whiteSpace: "nowrap", // ⬅️ prevents accidental wrapping
-  }}
->
-  {updateTimeMs} ms
-</Text>
+            size="2"
+            weight="medium"
+            style={{
+              minWidth: "64px",
+              paddingInline: "4px",
+              textAlign: "right",
+              fontVariantNumeric: "tabular-nums",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {updateTimeMs} ms
+          </Text>
         </Flex>
       </Flex>
     </Box>

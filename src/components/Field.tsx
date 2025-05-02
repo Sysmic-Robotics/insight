@@ -188,7 +188,7 @@ export const Field: React.FC<{ robots: RobotProps[]; ball: BallComponent | null 
         />
         {/* Robots */}
   {robots.map((robot) => (
-    <Robot key={robot.id} {...robot} />
+    <Robot key={`${robot.team}-${robot.id}`} {...robot} />
   ))}
   {/* Ball */}
   {ball && <BallComponent key="ball" position={ball.position} />}

@@ -32,7 +32,7 @@ export const RobotSelector: React.FC<RobotSelectorProps> = ({
       <Flex wrap="wrap" gap="2">
         {robots.map((robot) => (
           <Button
-            key={robot.id}
+            key={`${robot.team}-${robot.id}`}
             variant={selectedId === robot.id ? "solid" : "soft"}
             color={selectedId === robot.id ? "blue" : "gray"}
             radius="none"
