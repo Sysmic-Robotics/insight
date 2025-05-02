@@ -1,11 +1,9 @@
-/*import { contextBridge, ipcRenderer } from "electron";
 
-contextBridge.exposeInMainWorld("electron", {
-  ipcRenderer: {
-    startBackend: () => ipcRenderer.invoke("start-backend"),
-  },
+import { contextBridge, ipcRenderer } from "electron";
+
+contextBridge.exposeInMainWorld("api", {
+  openLuaFile: () => ipcRenderer.invoke("open-lua-file"),
+  saveLuaFileToPath: (filePath: string, content: string) =>
+    ipcRenderer.invoke("save-lua-file-to-path", filePath, content),
 });
-*/
-import { contextBridge } from "electron";
 
-contextBridge.exposeInMainWorld("electron", {});

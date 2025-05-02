@@ -1,6 +1,6 @@
 {
   "name": "electron-gui",
-  "author":"GersonHMG",
+  "author": "GersonHMG",
   "private": true,
   "version": "0.0.0",
   "main": "electron/index.cjs",
@@ -18,9 +18,9 @@
     "appId": "com.SysmicRobotics.CondorSSL",
     "productName": "CondorSSL",
     "files": [
-    "dist/**/*",
-    "electron/**/*",
-    "dist-electron/**/*"     
+      "dist/**/*",
+      "electron/**/*",
+      "dist-electron/**/*"
     ],
     "directories": {
       "output": "release"
@@ -30,6 +30,7 @@
     }
   },
   "dependencies": {
+    "@monaco-editor/react": "^4.7.0",
     "@radix-ui/react-icons": "^1.3.2",
     "@radix-ui/themes": "^3.2.1",
     "clsx": "^2.1.1",

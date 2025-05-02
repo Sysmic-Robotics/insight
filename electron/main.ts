@@ -1,6 +1,6 @@
-import { app, BrowserWindow, ipcMain } from "electron";
+import { app, BrowserWindow, ipcMain, dialog } from "electron";
 import * as path from "path";
-import { spawn, exec } from "child_process";
+import * as fs from "fs";
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -30,14 +30,23 @@ function createWindow() {
 
 app.whenReady().then(createWindow);
 
-/*
-ipcMain.handle("start-backend", () => {
-  const backendPath = "C:/Robocup/CondorSSL/build/SysmicSoftware.exe";
-
-  console.log("🟡 Launching backend via cmd start...");
-
-  spawn("cmd.exe", ["/c", "start", `"Backend"`, backendPath], {
-    windowsHide: false,
+// ✅ Open Lua file
+ipcMain.handle("open-lua-file", async () => {
+  const { canceled, filePaths } = await dialog.showOpenDialog({
+    filters: [{ name: "Lua files", extensions: ["lua"] }],
+    properties: ["openFile"]
   });
+
+  if (canceled || filePaths.length === 0) return { content: "", path: "" };
+
+  const path = filePaths[0];
+  const content = fs.readFileSync(path, "utf-8");
+
+  return { content, path };
 });
-*/
+
+
+// ✅ Save Lua file
+ipcMain.handle("save-lua-file-to-path", async (_event, filePath: string, content: string) => {
+  fs.writeFileSync(filePath, content, "utf-8");
+});

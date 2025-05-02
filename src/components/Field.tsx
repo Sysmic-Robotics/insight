@@ -26,7 +26,7 @@ export const Field: React.FC<{ robots: RobotProps[]; ball: BallComponent | null 
   const handleWheel = (e: React.WheelEvent) => {
     e.preventDefault();
     const delta = -e.deltaY;
-    setZoom((prev) => Math.min(Math.max(prev + delta * 0.01, 0.2), 5));
+    setZoom((prev) => Math.min(Math.max(prev + delta * 0.001, 0.5), 5));
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
