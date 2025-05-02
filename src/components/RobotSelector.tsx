@@ -12,16 +12,18 @@ import {
 
 type RobotSelectorProps = {
   robots: Robot[];
-  selectedId: number | null;
-  onChange: (id: number) => void;
+  selectedKey: string | null;
+  onChange: (key: string) => void;    // 👈 changed
 };
 
 export const RobotSelector: React.FC<RobotSelectorProps> = ({
   robots,
-  selectedId,
+  selectedKey,
   onChange,
 }) => {
-  const selectedRobot = robots.find((r) => r.id === selectedId);
+  const selectedRobot = robots.find(
+    (r) => `${r.team}-${r.id}` === selectedKey
+  );
 
   return (
     <Box mb="5">
@@ -30,18 +32,21 @@ export const RobotSelector: React.FC<RobotSelectorProps> = ({
       </Text>
 
       <Flex wrap="wrap" gap="2">
-        {robots.map((robot) => (
+      {robots.map((robot) => {
+        const key = `${robot.team}-${robot.id}`;
+        return (
           <Button
-            key={`${robot.team}-${robot.id}`}
-            variant={selectedId === robot.id ? "solid" : "soft"}
-            color={selectedId === robot.id ? "blue" : "gray"}
+            key={key}
+            variant={selectedKey === key ? "solid" : "soft"}
+            color={selectedKey === key ? "blue" : "gray"}
             radius="none"
-            onClick={() => onChange(robot.id)}
+            onClick={() => onChange(key)}
             size="1"
           >
-            #{robot.id}
+            #{robot.id} ({robot.team})
           </Button>
-        ))}
+        );
+      })}
       </Flex>
 
       <Box mt="4">

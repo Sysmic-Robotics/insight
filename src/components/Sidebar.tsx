@@ -9,7 +9,7 @@ type SidebarProps = {
 };
 
 export const Sidebar: React.FC<SidebarProps> = ({ robots }) => {
-  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [selectedKey, setSelectedKey] = useState<string | null>(null);
 
   return (
     <Box
@@ -27,10 +27,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ robots }) => {
             Robot Selector
           </Text>
 
+          
+
           <RobotSelector
             robots={robots}
-            selectedId={selectedId}
-            onChange={setSelectedId}
+            selectedKey={selectedKey}
+            onChange={setSelectedKey}
           />
 
           <ScriptPanel />
