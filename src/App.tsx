@@ -1,132 +1,125 @@
+// src/App.tsx
 import React, { useState } from "react";
-import { Sidebar } from "./components/Sidebar";
-import { Field } from "./components/Field";
-import { Topbar } from "./components/TopBar";
-import { TerminalPanel } from "./components/TerminalPanel";
-import { LuaFileExplorer, LuaFileNode } from "./components/LuaFileExplorer";
+import { Navbar, NavbarBrand, Divider, Card, Button } from "@heroui/react";
+import { Icon } from "@iconify/react";
+import ConnectionStatus from "./components/ConnectionStatus";
+import RobotDataPanel from "./components/RobotDataPanel";
+import FileExplorer, { LuaFileNode } from "./components/FileExplorer";
+import Terminal from "./components/Terminal";
 import { useRobotData } from "./hooks/useRobotData";
-import { BackendSocketProvider, useBackendSocketContext } from "./context/BackendSocketContext";
-import { Theme } from '@radix-ui/themes';
-import '@radix-ui/themes/styles.css';
-import { CodeEditor } from "./components/CodeEditor"; // ✅ Add this import
-import { Button } from "@radix-ui/themes";
+import { BackendSocketProvider } from "./context/BackendSocketContext";
+import { CodeEditor } from "./components/CodeEditor";
+import FieldVisualization from "./components/FieldVisualization";
+import FieldCodePanel from "./components/FieldCodePanel";
 
 function InnerApp() {
-  const { connected } = useBackendSocketContext();
-  const { robots, ball, updateTimeUs } = useRobotData();
+  const { robots, ball } = useRobotData();
 
+  // ─── Lua File Explorer State ─────────────────────────────────────────────
   const [luaTree, setLuaTree] = useState<LuaFileNode[]>([]);
   const [currentFile, setCurrentFile] = useState<string | null>(null);
+  const [filePath, setFilePath] = useState<string | null>(null);
 
   const openFolder = async () => {
     const tree = await window.api.selectLuaFolder();
-    setLuaTree(tree);
-  };
-
-  const openLuaFile = async (filePath: string) => {
-    const result = await window.api.readLuaFile(filePath);
-    if (result?.content) {
-      setCode(result.content);
-      setCurrentFile(filePath);   // ✅ for selection
-      setFilePath(filePath);      // ✅ for saving
+    if (tree) {
+      setLuaTree(tree);
+      setCurrentFile(null);
+      setFilePath(null);
     }
   };
-  
 
-
-
-  const [logs] = useState<string[]>(
-    Array.from({ length: 50 }, (_, i) => `[Lua] Log message ${i + 1}`)
-  );
-
-  const [view, setView] = useState<"field" | "editor">("field");
-  const [code, setCode] = useState("function main() end");
-  const [filePath, setFilePath] = useState<string | null>(null);
-
-  const toggleView = () => {
-    setView((prev) => (prev === "field" ? "editor" : "field"));
+  const openLuaFile = async (path: string) => {
+    const result = await window.api.readLuaFile(path);
+    if (result?.content) {
+      setCode(result.content);
+      setCurrentFile(path);
+      setFilePath(path);
+    }
   };
 
-  return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateRows: "30px 1fr 160px",
-        overflow: "hidden",
-        backgroundColor: "white",
-      }}
-    >
-      {/* Sidebar */}
-      {/* Sidebar + Explorer */}
-      <div style={{ gridRow: "1 / span 3", gridColumn: "1", overflow: "hidden", display: "flex", flexDirection: "column" }}>
-        <Sidebar robots={robots} />
-        <Button onClick={openFolder} size="1" style={{ margin: "4px" }}>📂 Open Folder</Button>
-        <LuaFileExplorer nodes={luaTree} onOpen={openLuaFile} currentFile={currentFile} />
-      </div>
+  // ─── Code Editor State ────────────────────────────────────────────────────
+  const [showCode, setShowCode] = useState(false);
+  const [code, setCode] = useState<string>(
+    `// start typing your TSX here\nfunction Foo() {\n  return <div>Hello world</div>;\n}`
+  );
 
-      {/* Topbar */}
-      <div style={{ gridRow: "1", gridColumn: "2", display: "flex", justifyContent: "space-between" }}>
-        <Topbar connected={connected} updateTimeUs={updateTimeUs} />
-        <div style={{ padding: "4px 8px" }}>
-          <Button variant="outline" size="1" onClick={toggleView}>
-            {view === "field" ? "Switch to Code Editor" : "Switch to Field View"}
-          </Button>
+  return (
+    <div className="flex flex-col h-screen w-screen overflow-hidden bg-content1">
+      {/* Top Bar */}
+      <Navbar maxWidth="full" className="border-b border-divider h-14">
+        <NavbarBrand>
+          <Icon icon="logos:robot-framework" className="text-2xl mr-2" />
+          <p className="font-bold text-inherit">RoboCup SSL Developer</p>
+        </NavbarBrand>
+        <ConnectionStatus />
+      </Navbar>
+
+      {/* Main Content */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Sidebar */}
+        <Card className="w-80 h-full rounded-none shadow-none border-r border-divider">
+          <div className="flex flex-col h-full">
+            {/* Robot Data Panel */}
+            <div className="flex-1 overflow-auto">
+              <div className="p-3 font-medium text-sm flex items-center">
+                <Icon icon="lucide:cpu" className="mr-2" />
+                Robot Data
+              </div>
+              <Divider />
+              <RobotDataPanel />
+            </div>
+
+            {/* File Explorer Panel */}
+            <div className="flex-1 overflow-auto border-t border-divider">
+              <div className="p-3 font-medium text-sm flex items-center justify-between">
+                <div className="flex items-center">
+                  <Icon icon="lucide:folder" className="mr-2" />
+                  File Explorer
+                </div>
+                <Button
+                  size="sm"
+                  variant="flat"
+                  onPress={openFolder}
+                  isIconOnly
+                  aria-label="Open Folder"
+                >
+                  <Icon icon="lucide:folder-open" />
+                </Button>
+              </div>
+              <Divider />
+              <FileExplorer
+                nodes={luaTree}
+                currentFile={currentFile}
+                onOpen={openLuaFile}
+              />
+            </div>
+          </div>
+        </Card>
+
+        {/* Right Content Area */}
+        <div className="flex-1 flex flex-col overflow-hidden">
+          {/* Field / Code Panel */}
+          <FieldCodePanel robots={robots} ball={ball} />
+
+          {/* Terminal Panel */}
+          <Card className="h-1/4 rounded-none shadow-none">
+            <div className="p-3 font-medium text-sm flex items-center border-b border-divider">
+              <Icon icon="lucide:terminal" className="mr-2" />
+              Terminal
+            </div>
+            <Terminal />
+          </Card>
         </div>
       </div>
-
-      {/* Main Panel */}
-      <div
-  style={{
-    gridRow: "2",
-    gridColumn: "2",
-    position: "relative",
-    overflow: "hidden",
-  }}
->
-  {view === "field" ? (
-    <Field robots={robots} ball={ball} />
-  ) : (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
-      <div style={{ padding: "4px", display: "flex", gap: "8px" }}>
-
-          <Button
-      onClick={async () => {
-        if (filePath) {
-          await window.api.saveLuaFileToPath(filePath, code);
-          console.log("✅ Saved:", filePath);
-        } else {
-          alert("⚠️ No file selected to save.");
-        }
-      }}
-    >
-      Save
-    </Button>
-      </div>
-      <div style={{ flex: 1 }}>
-        <CodeEditor value={code} onChange={setCode} language="lua" />
-      </div>
-    </div>
-  )}
-</div>
-
-      {/* TerminalPanel */}
-      <div style={{ gridRow: "3", gridColumn: "2", overflow: "hidden" }}>
-        <TerminalPanel logs={logs} />
-      </div>
     </div>
   );
 }
 
-function App() {
-  const [showSplash, setShowSplash] = useState(true);
-
+export default function App() {
   return (
-    <Theme appearance="light">
-      <BackendSocketProvider>
-        <InnerApp />
-      </BackendSocketProvider>
-    </Theme>
+    <BackendSocketProvider>
+      <InnerApp />
+    </BackendSocketProvider>
   );
 }
-
-export default App;
