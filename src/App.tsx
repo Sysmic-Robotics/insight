@@ -8,17 +8,15 @@ import FileExplorer, { LuaFileNode } from "./components/FileExplorer";
 import Terminal from "./components/Terminal";
 import { useRobotData } from "./hooks/useRobotData";
 import { BackendSocketProvider } from "./context/BackendSocketContext";
-import { CodeEditor } from "./components/CodeEditor";
-import FieldVisualization from "./components/FieldVisualization";
 import FieldCodePanel from "./components/FieldCodePanel";
 
 function InnerApp() {
   const { robots, ball } = useRobotData();
 
-  // ─── Lua File Explorer State ─────────────────────────────────────────────
+  // ─── Lua File Explorer State ─────────────────────────────────────────
   const [luaTree, setLuaTree] = useState<LuaFileNode[]>([]);
   const [currentFile, setCurrentFile] = useState<string | null>(null);
-  const [filePath, setFilePath] = useState<string | null>(null);
+  const [filePath, setFilePath]       = useState<string | null>(null);
 
   const openFolder = async () => {
     const tree = await window.api.selectLuaFolder();
@@ -38,8 +36,7 @@ function InnerApp() {
     }
   };
 
-  // ─── Code Editor State ────────────────────────────────────────────────────
-  const [showCode, setShowCode] = useState(false);
+  // ─── Code Editor State (lifted) ────────────────────────────────────────
   const [code, setCode] = useState<string>(
     `// start typing your TSX here\nfunction Foo() {\n  return <div>Hello world</div>;\n}`
   );
@@ -100,7 +97,12 @@ function InnerApp() {
         {/* Right Content Area */}
         <div className="flex-1 flex flex-col overflow-hidden">
           {/* Field / Code Panel */}
-          <FieldCodePanel robots={robots} ball={ball} />
+          <FieldCodePanel
+            robots={robots}
+            ball={ball}
+            code={code}
+            setCode={setCode}
+          />
 
           {/* Terminal Panel */}
           <Card className="h-1/4 rounded-none shadow-none">

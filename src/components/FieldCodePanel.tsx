@@ -10,31 +10,28 @@ import { useScriptRunner } from "../hooks/useScriptRunner";
 interface FieldCodePanelProps {
   robots: ReturnType<typeof import("../hooks/useRobotData").useRobotData>["robots"];
   ball:   ReturnType<typeof import("../hooks/useRobotData").useRobotData>["ball"];
-  /** Initial code, if you want to override the default */
-  initialCode?: string;
+  /** The current code to display in the editor */
+  code: string;
+  /** Callback to update the code */
+  setCode: React.Dispatch<React.SetStateAction<string>>;
 }
-
-const DEFAULT_CODE = `// start typing your TSX here
-function Foo() {
-  return <div>Hello world</div>;
-}`;
 
 export default function FieldCodePanel({
   robots,
   ball,
-  initialCode = DEFAULT_CODE,
+  code,
+  setCode,
 }: FieldCodePanelProps) {
   const [showCode, setShowCode] = useState(false);
-  const [code, setCode] = useState<string>(initialCode);
 
-  // pull socket from context and hook up run/pause logic
+  // Grab socket & script runner logic
   const { socket } = useBackendSocketContext();
   const { scriptState, toggle } = useScriptRunner(socket);
 
   return (
     <Card className="flex-1 rounded-none shadow-none border-b border-divider">
       <div className="p-3 font-medium text-sm flex items-center justify-between border-b border-divider">
-        {/* title */}
+        {/* Title */}
         <div className="flex items-center">
           <Icon
             icon={showCode ? "lucide:code" : "lucide:layout-grid"}
@@ -43,7 +40,7 @@ export default function FieldCodePanel({
           <span>{showCode ? "Code Editor" : "Field Visualization"}</span>
         </div>
 
-        {/* buttons: run/pause + toggle view */}
+        {/* Buttons: Run/Pause + Toggle View */}
         <div className="flex items-center space-x-2">
           {/* Run / Pause */}
           <Button
@@ -52,9 +49,7 @@ export default function FieldCodePanel({
             color={scriptState === "running" ? "warning" : "success"}
             onPress={toggle}
             isIconOnly
-            aria-label={
-              scriptState === "running" ? "Pause Script" : "Run Script"
-            }
+            aria-label={scriptState === "running" ? "Pause Script" : "Run Script"}
           >
             <Icon
               icon={scriptState === "running" ? "lucide:pause" : "lucide:play"}
@@ -75,7 +70,7 @@ export default function FieldCodePanel({
         </div>
       </div>
 
-      {/* content */}
+      {/* Content Area */}
       <div className="flex-1">
         {showCode ? (
           <CodeEditor
