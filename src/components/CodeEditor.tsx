@@ -1,6 +1,15 @@
 // src/components/CodeEditor.tsx
 import React from "react";
-import Editor from "@monaco-editor/react";
+import Editor, { loader } from "@monaco-editor/react";
+
+// Register Lua language with Monaco
+loader.init().then((monaco) => {
+  import("monaco-editor/esm/vs/basic-languages/lua/lua").then((mod) => {
+    monaco.languages.register({ id: "lua" });
+    monaco.languages.setMonarchTokensProvider("lua", mod.language);
+    monaco.languages.setLanguageConfiguration("lua", mod.conf);
+  });
+});
 
 type CodeEditorProps = {
   value: string;
@@ -12,7 +21,7 @@ type CodeEditorProps = {
 export const CodeEditor: React.FC<CodeEditorProps> = ({
   value,
   onChange,
-  language = "javascript",
+  language = "lua",
   height = "100%",
 }) => {
   return (
@@ -27,6 +36,8 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
         minimap: { enabled: false },
         scrollBeyondLastLine: false,
         automaticLayout: true,
+        suggestOnTriggerCharacters: true,
+        quickSuggestions: true,
       }}
     />
   );

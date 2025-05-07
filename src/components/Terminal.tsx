@@ -1,98 +1,56 @@
 import React from "react";
 import { Input, Code } from "@heroui/react";
 import { Icon } from "@iconify/react";
-
-interface LogEntry {
-  timestamp: string;
-  type: "info" | "warning" | "error" | "success";
-  message: string;
-}
+import { useSelector } from "react-redux";
+import { RootState } from "../store/store";
+import { LogEntry } from "../store/notificationSlice";
 
 const Terminal: React.FC = () => {
   const [command, setCommand] = React.useState("");
-  const [logs, setLogs] = React.useState<LogEntry[]>([
-    {
-      timestamp: "10:23:45",
-      type: "info",
-      message: "System initialized",
-    },
-    {
-      timestamp: "10:23:46",
-      type: "info",
-      message: "Connecting to vision system...",
-    },
-    {
-      timestamp: "10:23:48",
-      type: "success",
-      message: "Connected to vision system",
-    },
-    {
-      timestamp: "10:23:50",
-      type: "info",
-      message: "Searching for robots...",
-    },
-    {
-      timestamp: "10:23:52",
-      type: "warning",
-      message: "Robot #3 not responding",
-    },
-    {
-      timestamp: "10:23:55",
-      type: "error",
-      message: "Failed to connect to Robot #5",
-    },
-  ]);
+  const externalLogs = useSelector((state: RootState) => state.notification.messages);
+  const [localLogs, setLocalLogs] = React.useState<LogEntry[]>([]);
   const terminalRef = React.useRef<HTMLDivElement>(null);
 
+  // Whenever logs change, scroll to bottom
   React.useEffect(() => {
     if (terminalRef.current) {
       terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
     }
-  }, [logs]);
+  }, [externalLogs, localLogs]);
 
   const handleCommand = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && command.trim()) {
-      const now = new Date();
-      const timestamp = `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
-      
-      setLogs([
-        ...logs,
-        {
-          timestamp,
-          type: "info",
-          message: `> ${command}`,
-        },
-      ]);
-      
-      // Process command (mock response)
+      const now = new Date().toLocaleTimeString();
+      const userInput: LogEntry = {
+        timestamp: now,
+        type: "info",
+        message: `> ${command}`,
+      };
+      setLocalLogs((prev) => [...prev, userInput]);
+
+      // mock response
       setTimeout(() => {
-        let responseType: "info" | "warning" | "error" | "success" = "info";
-        let responseMessage = "Command not recognized";
-        
+        let response: LogEntry = {
+          timestamp: now,
+          type: "info",
+          message: "Command not recognized",
+        };
         if (command.includes("help")) {
-          responseMessage = "Available commands: status, connect, disconnect, reset";
+          response.message = "Available commands: status, connect, disconnect, reset";
         } else if (command.includes("status")) {
-          responseMessage = "System status: 4/5 robots online, vision system active";
-          responseType = "success";
+          response.message = "System status: 4/5 robots online, vision system active";
+          response.type = "success";
         } else if (command.includes("reset")) {
-          responseMessage = "Resetting system...";
+          response.message = "Resetting system...";
         }
-        
-        setLogs((prevLogs) => [
-          ...prevLogs,
-          {
-            timestamp,
-            type: responseType,
-            message: responseMessage,
-          },
-        ]);
+        setLocalLogs((prev) => [...prev, response]);
       }, 300);
-      
+
       setCommand("");
     }
   };
 
-  const getLogColor = (type: string) => {
+  const getLogColor = (type: LogEntry["type"]) => {
     switch (type) {
       case "info":
         return "text-default-600";
@@ -107,20 +65,23 @@ const Terminal: React.FC = () => {
     }
   };
 
+  // Merge Redux logs and local logs — both arrays are in chronological order
+  const allLogs = [...externalLogs, ...localLogs];
+
   return (
     <div className="flex flex-col h-full">
-      <div 
+      <div
         ref={terminalRef}
-        className="flex-1 overflow-y-auto p-3 font-mono text-sm bg-content1"
+        className="flex-1 overflow-y-auto p-3 pb-14 scroll-pb-14 font-mono text-sm bg-content1"
       >
-        {logs.map((log, index) => (
-          <div key={index} className="mb-1">
+        {allLogs.map((log, idx) => (
+          <div key={idx} className="mb-1">
             <span className="text-default-400">[{log.timestamp}]</span>{" "}
             <span className={getLogColor(log.type)}>{log.message}</span>
           </div>
         ))}
       </div>
-      <div className="p-2 border-t border-divider">
+      <div className="flex-none p-2 border-t border-divider bg-content1 sticky bottom-0 z-10">
         <Input
           fullWidth
           placeholder="Enter command..."
@@ -128,12 +89,8 @@ const Terminal: React.FC = () => {
           onChange={(e) => setCommand(e.target.value)}
           onKeyDown={handleCommand}
           startContent={<Icon icon="lucide:terminal" />}
-          endContent={
-            <Code className="text-xs bg-default-100 px-1">Enter</Code>
-          }
-          classNames={{
-            input: "font-mono",
-          }}
+          endContent={<Code className="text-xs bg-default-100 px-1">Enter</Code>}
+          classNames={{ input: "font-mono" }}
         />
       </div>
     </div>
