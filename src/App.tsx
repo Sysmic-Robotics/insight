@@ -97,7 +97,7 @@ function InnerApp() {
                 Robot Data
               </div>
               <Divider />
-              <RobotDataPanel />
+              <RobotDataPanel robots={robots} />
             </div>
             <div className="flex-1 overflow-auto border-t border-divider">
               <div className="p-3 font-medium text-sm flex items-center justify-between">
