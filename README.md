@@ -1,6 +1,6 @@
 
 <p align="center">
-  <img src="https://cdn-icons-png.flaticon.com/512/3187/3187558.png" alt="CondorSSL Logo" width="180"/>
+  <img src="https://raw.githubusercontent.com/GersonHMG/frontend_prototype/blob/main/docs/logoinsight.png" alt="CondorSSL Logo" width="180"/>
 </p>
 
 <h1 align="center">CondorSSL</h1>
