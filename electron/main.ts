@@ -8,7 +8,8 @@ function createWindow() {
     height: 600,
     resizable: true,
     autoHideMenuBar: true,
-    title: "CondorSSL",
+    title: "Insight CondorSSL",
+    icon: path.join(__dirname, "../src/assets/insightLogo.ico"),
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,
