@@ -10,6 +10,8 @@ import { useRobotData } from "./hooks/useRobotData";
 import { BackendSocketProvider } from "./context/BackendSocketContext";
 import FieldCodePanel from "./components/FieldCodePanel";
 import { useGamepadPolling } from "./hooks/useGamepadPolling"; // adjust path
+import JoystickCommandSender from "./components/JoystickCommandSender";
+
 const MIN_TERMINAL_HEIGHT = 100;  // px
 
 function InnerApp() {
@@ -162,6 +164,7 @@ function InnerApp() {
 export default function App() {
   return (
     <BackendSocketProvider>
+      <JoystickCommandSender />
       <InnerApp />
     </BackendSocketProvider>
   );

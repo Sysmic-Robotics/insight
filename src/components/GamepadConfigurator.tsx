@@ -8,8 +8,13 @@ import {
   Button,
 } from "@heroui/react";
 import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "../store/store"; // adjust path if needed
-import { setGamepadEnabled } from "../store/gamepadSlice"; // adjust path if needed
+import { RootState } from "../store/store";
+import {
+  setGamepadEnabled,
+  setVxScale,
+  setVyScale,
+  setOmegaScale,
+} from "../store/gamepadSlice";
 
 interface GamepadConfiguratorProps {
   isOpen: boolean;
@@ -21,7 +26,7 @@ const GamepadConfigurator: React.FC<GamepadConfiguratorProps> = ({
   onOpenChange,
 }) => {
   const dispatch = useDispatch();
-  const { connected, axes, buttons, enabled } = useSelector(
+  const { connected, axes, buttons, enabled, vxScale, vyScale, omegaScale } = useSelector(
     (state: RootState) => state.gamepad
   );
 
@@ -87,6 +92,48 @@ const GamepadConfigurator: React.FC<GamepadConfiguratorProps> = ({
                   {renderButton(0, "A", "bg-green-400")}
                   {renderButton(3, "Y", "bg-yellow-400")}
                   {renderButton(1, "B", "bg-red-400")}
+                </div>
+
+                {/* Scale Controls */}
+                <div className="space-y-4 pt-4">
+                  <div>
+                    <label className="text-sm font-medium">Vx Scale: {vxScale.toFixed(2)}</label>
+                    <input
+                      type="range"
+                      min={0}
+                      max={2}
+                      step={0.05}
+                      value={vxScale}
+                      onChange={(e) => dispatch(setVxScale(parseFloat(e.target.value)))}
+                      className="w-full"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium">Vy Scale: {vyScale.toFixed(2)}</label>
+                    <input
+                      type="range"
+                      min={0}
+                      max={2}
+                      step={0.05}
+                      value={vyScale}
+                      onChange={(e) => dispatch(setVyScale(parseFloat(e.target.value)))}
+                      className="w-full"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium">Theta Scale: {omegaScale.toFixed(2)}</label>
+                    <input
+                      type="range"
+                      min={0}
+                      max={5}
+                      step={0.05}
+                      value={omegaScale}
+                      onChange={(e) => dispatch(setOmegaScale(parseFloat(e.target.value)))}
+                      className="w-full"
+                    />
+                  </div>
                 </div>
               </div>
             </ModalBody>
