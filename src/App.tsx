@@ -9,12 +9,14 @@ import Terminal from "./components/Terminal";
 import { useRobotData } from "./hooks/useRobotData";
 import { BackendSocketProvider } from "./context/BackendSocketContext";
 import FieldCodePanel from "./components/FieldCodePanel";
+import { useGamepadPolling } from "./hooks/useGamepadPolling"; // adjust path
+import JoystickCommandSender from "./components/JoystickCommandSender";
 
 const MIN_TERMINAL_HEIGHT = 100;  // px
 
 function InnerApp() {
   const { robots, ball } = useRobotData();
-
+  useGamepadPolling(); // starts polling on app load
   // ─── Lua File Explorer State ─────────────────────────────────────────
   const [luaTree, setLuaTree] = useState<LuaFileNode[]>([]);
   const [currentFile, setCurrentFile] = useState<string | null>(null);
@@ -162,6 +164,7 @@ function InnerApp() {
 export default function App() {
   return (
     <BackendSocketProvider>
+      <JoystickCommandSender />
       <InnerApp />
     </BackendSocketProvider>
   );
