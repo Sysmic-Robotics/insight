@@ -1,4 +1,3 @@
-// src/App.tsx
 import React, { useState, useRef, useEffect } from "react";
 import { Navbar, NavbarBrand, Divider, Card, Button } from "@heroui/react";
 import { Icon } from "@iconify/react";
@@ -97,6 +96,8 @@ function InnerApp() {
     mediaQuery.addEventListener("change", handleChange);
     return () => mediaQuery.removeEventListener("change", handleChange);
   }, []);
+
+  console.log("App renderizada correctamente");
 
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-content1">

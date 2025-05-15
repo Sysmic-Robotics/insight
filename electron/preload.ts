@@ -1,5 +1,6 @@
-
 import { contextBridge, ipcRenderer } from "electron";
+
+console.log("Preload script cargado correctamente");
 
 contextBridge.exposeInMainWorld("api", {
   openLuaFile: () => ipcRenderer.invoke("open-lua-file"),

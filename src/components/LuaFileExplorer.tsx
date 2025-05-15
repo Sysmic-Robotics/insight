@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Button, Text } from "@radix-ui/themes";
+import { Button } from "@heroui/react";
 
 export type LuaFileNode = {
   name: string;
@@ -15,6 +15,7 @@ type Props = {
 };
 
 export const LuaFileExplorer: React.FC<Props> = ({ nodes, currentFile, onOpen }) => {
+  console.log("LuaFileExplorer renderizado con nodos:", nodes);
   return (
     <Box pl="2">
       {nodes.map((node) =>
@@ -24,8 +25,12 @@ export const LuaFileExplorer: React.FC<Props> = ({ nodes, currentFile, onOpen })
           <Button
             key={node.path}
             variant={node.path === currentFile ? "solid" : "ghost"}
-            size="1"
-            onClick={() => onOpen(node.path)}
+            size="sm"
+            onClick={() => {
+              console.log(`Botón clickeado: ${node.name}`); // Log adicional
+              console.log(`Archivo clickeado: ${node.name} (${node.path})`);
+              onOpen(node.path);
+            }}
             style={{ width: "100%", justifyContent: "flex-start", marginBottom: "2px" }}
           >
             {node.name}
@@ -42,19 +47,25 @@ const Folder: React.FC<{ node: LuaFileNode; onOpen: (p: string) => void; current
   currentFile,
 }) => {
   const [open, setOpen] = useState(false);
+  console.log(`Renderizando componente Folder para: ${node.name}`); // Log para confirmar renderizado
+  console.log(`Nodos hijos de ${node.name}:`, node.children); // Verificar datos de nodos hijos
 
   return (
     <Box>
-      <Button
-        variant="ghost"
-        size="1"
-        onClick={() => setOpen(!open)}
-        style={{ width: "100%", justifyContent: "flex-start", fontWeight: "bold" }}
+      <button
+        onClick={() => {
+          console.log(`Carpeta clickeada: ${node.name}`); // Log adicional para verificar el clic
+          const newState = !open;
+          console.log(`Toggle folder: ${node.name}. Nuevo estado: ${newState}`);
+          setOpen(newState);
+        }}
+        style={{ width: "100%", justifyContent: "flex-start", fontWeight: "bold", display: "block" }}
       >
         📁 {node.name}
-      </Button>
+      </button>
       {open && node.children && (
-        <Box pl="2">
+        <Box pl="2" style={{ borderLeft: "1px solid #ccc", marginLeft: "8px" }}>
+          {console.log(`Carpeta ${node.name} abierta. Hijos:`, node.children)}
           <LuaFileExplorer nodes={node.children} onOpen={onOpen} currentFile={currentFile} />
         </Box>
       )}
