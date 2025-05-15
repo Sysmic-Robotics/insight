@@ -9,10 +9,12 @@ import Terminal from "./components/Terminal";
 import { useRobotData } from "./hooks/useRobotData";
 import { BackendSocketProvider } from "./context/BackendSocketContext";
 import FieldCodePanel from "./components/FieldCodePanel";
+import { ThemeToggle } from "./components/Theme";
 import { useGamepadPolling } from "./hooks/useGamepadPolling"; // adjust path
 import JoystickCommandSender from "./components/JoystickCommandSender";
 
-const MIN_TERMINAL_HEIGHT = 100;  // px
+
+const MIN_TERMINAL_HEIGHT = 100; // px
 
 function InnerApp() {
   const { robots, ball } = useRobotData();
@@ -85,13 +87,13 @@ function InnerApp() {
           <p className="font-bold text-inherit">RoboCup SSL Developer</p>
         </NavbarBrand>
         <ConnectionStatus />
+        <ThemeToggle />
       </Navbar>
 
       {/* Main Content */}
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
         <Card className="w-80 h-full rounded-none shadow-none border-r border-divider">
-          {/* ... robot data & file explorer as before ... */}
           <div className="flex flex-col h-full">
             <div className="flex-1 overflow-auto">
               <div className="p-3 font-medium text-sm flex items-center">
@@ -129,7 +131,6 @@ function InnerApp() {
 
         {/* Right Content Area */}
         <div ref={rightRef} className="flex-1 flex flex-col overflow-hidden">
-          {/* Field / Code Panel */}
           <FieldCodePanel
             robots={robots}
             ball={ball}
@@ -144,7 +145,7 @@ function InnerApp() {
             onMouseDown={() => setIsResizing(true)}
           />
 
-          {/* Terminal Panel (height controlled by state) */}
+          {/* Terminal Panel */}
           <Card
             className="rounded-none shadow-none border-t border-divider overflow-hidden"
             style={{ height: termHeight }}
