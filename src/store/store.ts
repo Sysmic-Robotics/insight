@@ -1,10 +1,12 @@
 // src/store/store.ts
 import { configureStore } from '@reduxjs/toolkit';
 import notificationReducer from './notificationSlice';
+import gamepadReducer from "./gamepadSlice";
 
 export const store = configureStore({
   reducer: {
     notification: notificationReducer,
+    gamepad: gamepadReducer,
   },
 });
 

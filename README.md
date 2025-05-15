@@ -3,7 +3,7 @@
   <img src="https://i.imgur.com/LN4MGdz.png" alt="CondorSSL Logo" width="180"/>
 </p>
 
-<h1 align="center">CondorSSL</h1>
+<h1 align="center">Insight</h1>
 
 <p align="center">
   <a href="https://github.com/GersonHMG/frontend_prototype/blob/main/LICENSE">
@@ -15,7 +15,7 @@
 </p>
 
 <p align="center">
-  CondorSSL es una aplicación de escritorio desarrollada con Electron, React y Vite, diseñada para ofrecer una interfaz moderna y fluida para el control y gestión del engine de Sysmic Robotics.
+  Insight es una aplicación de escritorio desarrollada con Electron, React y Vite, diseñada para ofrecer una interfaz moderna y fluida para el control y gestión del engine de Sysmic Robotics.
 </p>
 
 

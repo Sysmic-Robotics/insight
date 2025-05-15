@@ -1,17 +1,19 @@
-// ConnectionStatus.tsx
-import React from "react";
+import React, { useState } from "react";
 import { Button, Tooltip } from "@heroui/react";
 import { Icon } from "@iconify/react";
-import { useBackendSocketContext } from "../context/BackendSocketContext"; // adjust path
+import { useBackendSocketContext } from "../context/BackendSocketContext";
+import GamepadConfigurator from "./GamepadConfigurator"; // adjust path as needed
 
 const ConnectionStatus: React.FC = () => {
-  // pull both the connected state and the connect() action from context
   const { connected, connect } = useBackendSocketContext();
   const isConnected = connected;
 
+  // Inside your component
+const [configOpen, setConfigOpen] = useState(false);
+
   return (
     <div className="flex items-center gap-4 ml-auto">
-      {/* status indicator */}
+      {/* Backend connection status */}
       <div className="flex items-center">
         <div
           className={`w-3 h-3 rounded-full mr-2 ${
@@ -23,7 +25,7 @@ const ConnectionStatus: React.FC = () => {
         </span>
       </div>
 
-      {/* connect button */}
+      {/* Connect to backend button */}
       <Tooltip content={isConnected ? "Already connected" : "Connect"}>
         <Button
           isIconOnly
@@ -40,6 +42,27 @@ const ConnectionStatus: React.FC = () => {
           <Icon icon={isConnected ? "lucide:plug" : "lucide:plug-off"} />
         </Button>
       </Tooltip>
+
+      {/* Configure gamepad button */}
+      <Tooltip content="Configure Gamepad">
+  <Button
+    isIconOnly
+    size="sm"
+    color="primary"
+    variant="flat"
+    onPress={() => setConfigOpen(true)}
+    aria-label="Configure gamepad"
+  >
+    <Icon icon="lucide:gamepad-2" />
+  </Button>
+</Tooltip>
+
+      {/* Gamepad Configurator Modal */}
+      
+      <GamepadConfigurator
+        isOpen={configOpen}
+        onOpenChange={setConfigOpen}
+      />
     </div>
   );
 };
