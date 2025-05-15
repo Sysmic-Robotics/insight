@@ -9,6 +9,7 @@ import Terminal from "./components/Terminal";
 import { useRobotData } from "./hooks/useRobotData";
 import { BackendSocketProvider } from "./context/BackendSocketContext";
 import FieldCodePanel from "./components/FieldCodePanel";
+import { ThemeToggle } from "./components/Theme";
 
 const MIN_TERMINAL_HEIGHT = 100; // px
 
@@ -74,30 +75,6 @@ function InnerApp() {
     };
   }, [isResizing]);
 
-  // ─── Dark Mode State ──────────────────────────────────────────────────
-  // Se inicia según la preferencia del sistema
-  const [darkMode, setDarkMode] = useState(() => {
-    return window.matchMedia &&
-      window.matchMedia("(prefers-color-scheme: dark)").matches;
-  });
-
-  useEffect(() => {
-    const root = document.documentElement;
-    if (darkMode) {
-      root.classList.add("dark");
-    } else {
-      root.classList.remove("dark");
-    }
-  }, [darkMode]);
-
-  // Actualiza el estado si la preferencia de color cambia en el sistema
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    const handleChange = (e: MediaQueryListEvent) => setDarkMode(e.matches);
-    mediaQuery.addEventListener("change", handleChange);
-    return () => mediaQuery.removeEventListener("change", handleChange);
-  }, []);
-
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-content1">
       {/* Top Bar */}
@@ -106,24 +83,8 @@ function InnerApp() {
           <Icon icon="logos:robot-framework" className="text-2xl mr-2" />
           <p className="font-bold text-inherit">RoboCup SSL Developer</p>
         </NavbarBrand>
-        <div style={{ display: "flex", alignItems: "center" }}>
-          <ConnectionStatus />
-          {/* Botón para alternar el modo oscuro */}
-          <Button
-            size="sm"
-            variant="bordered"
-            className="ml-4"
-            onPress={() => setDarkMode(!darkMode)}
-            style={{ height: "28px" }}
-            title={darkMode ? "Cambiar a Modo Claro" : "Cambiar a Modo Oscuro"}
-          >
-            {darkMode ? (
-              <Icon icon="lucide:sun" width="16" height="16" />
-            ) : (
-              <Icon icon="lucide:moon" width="16" height="16" />
-            )}
-          </Button>
-        </div>
+        <ConnectionStatus />
+        <ThemeToggle />
       </Navbar>
 
       {/* Main Content */}
