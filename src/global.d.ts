@@ -33,6 +33,7 @@ declare global {
        * @param callback Callback that receives a string of terminal output
        */
       onTerminalOutput: (callback: (data: string) => void) => void;
+      sendToEngine: (input: string) => Promise<string>;
     };
   }
 }

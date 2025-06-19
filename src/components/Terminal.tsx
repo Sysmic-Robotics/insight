@@ -8,7 +8,6 @@ import { addMessage, LogEntry } from "../store/notificationSlice";
 const Terminal: React.FC = () => {
   const [command, setCommand] = React.useState("");
   const externalLogs = useSelector((state: RootState) => state.notification.messages);
-  const [localLogs, setLocalLogs] = React.useState<LogEntry[]>([]);
   const terminalRef = React.useRef<HTMLDivElement>(null);
   const dispatch = useDispatch();
 
@@ -17,7 +16,7 @@ const Terminal: React.FC = () => {
     if (terminalRef.current) {
       terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
     }
-  }, [externalLogs, localLogs]);
+  }, [externalLogs]);
 
   // Listen for engine output
   React.useEffect(() => {
@@ -31,33 +30,33 @@ const Terminal: React.FC = () => {
     });
   }, [dispatch]);
 
-  const handleCommand = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  // Handle user-entered commands
+  const handleCommand = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && command.trim()) {
-      const now = new Date().toLocaleTimeString();
-      const userInput: LogEntry = {
-        timestamp: now,
+      const timestamp = new Date().toLocaleTimeString();
+
+      // Show the command in the terminal
+      dispatch(addMessage({
+        timestamp,
         type: "info",
         message: `> ${command}`,
-      };
-      setLocalLogs((prev) => [...prev, userInput]);
+      }));
 
-      // Mock response logic
-      setTimeout(() => {
-        let response: LogEntry = {
-          timestamp: now,
-          type: "info",
-          message: "Command not recognized",
-        };
-        if (command.includes("help")) {
-          response.message = "Available commands: status, connect, disconnect, reset";
-        } else if (command.includes("status")) {
-          response.message = "System status: 4/5 robots online, vision system active";
-          response.type = "success";
-        } else if (command.includes("reset")) {
-          response.message = "Resetting system...";
-        }
-        setLocalLogs((prev) => [...prev, response]);
-      }, 300);
+      // Send to engine via IPC
+      try {
+        const response = await window.api.sendToEngine(command);
+        dispatch(addMessage({
+          timestamp: new Date().toLocaleTimeString(),
+          type: "success",
+          message: response,
+        }));
+      } catch (err) {
+        dispatch(addMessage({
+          timestamp: new Date().toLocaleTimeString(),
+          type: "error",
+          message: "Failed to send command to engine",
+        }));
+      }
 
       setCommand("");
     }
@@ -78,10 +77,8 @@ const Terminal: React.FC = () => {
     }
   };
 
-  const allLogs = [...externalLogs, ...localLogs];
-
   const startEngine = async () => {
-    const exePath = "C:\\Robocup\\project\\condorssl\\engine\\build\\engine.exe"; // 🔧 Update this
+    const exePath = "C:\\Robocup\\project\\condorssl\\engine\\build\\engine.exe"; // ✅ Confirm path
     const message = await window.api.openEngine(exePath, []);
     const timestamp = new Date().toLocaleTimeString();
     dispatch(addMessage({
@@ -104,12 +101,12 @@ const Terminal: React.FC = () => {
         </button>
       </div>
 
-      {/* Log Display */}
+      {/* Log Output */}
       <div
         ref={terminalRef}
         className="flex-1 overflow-y-auto p-3 pb-14 scroll-pb-14 font-mono text-sm bg-content1"
       >
-        {allLogs.map((log, idx) => (
+        {externalLogs.map((log, idx) => (
           <div key={idx} className="mb-1">
             <span className="text-default-400">[{log.timestamp}]</span>{" "}
             <span className={getLogColor(log.type)}>{log.message}</span>

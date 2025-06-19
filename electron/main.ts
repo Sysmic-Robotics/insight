@@ -105,10 +105,12 @@ app.whenReady().then(() => {
     engine = spawn(exePath, args);
 
     engine.stdout.on('data', (data: Buffer) => {
+      console.log('[ENGINE STDOUT]', data.toString()); // 👈 log it
       win.webContents.send('terminal-output', data.toString());
     });
 
     engine.stderr.on('data', (data: Buffer) => {
+      console.log('[ENGINE STDOUT]', data.toString()); // 👈 log it
       win.webContents.send('terminal-output', `[stderr] ${data.toString()}`);
     });
 
@@ -118,6 +120,7 @@ app.whenReady().then(() => {
     });
 
     engine.on('error', (err: Error) => {
+      console.log('[ENGINE STDOUT]', err.message.toString()); // 👈 log it
       win.webContents.send('terminal-output', `\nError: ${err.message}`);
       engine = null;
     });
@@ -131,5 +134,17 @@ app.whenReady().then(() => {
     engine.kill();
     engine = null;
     return 'Engine stopped.';
+  });
+
+  ipcMain.handle('send-to-engine', (_event, input: string) => {
+    if (engine && !engine.killed) {
+      try {
+        engine.stdin.write(input + '\n');
+        return 'Command sent to engine.';
+      } catch (err) {
+        return 'Failed to send command: ' + (err as Error).message;
+      }
+    }
+    return 'Engine is not running.';
   });
 });

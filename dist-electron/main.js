@@ -122,9 +122,11 @@ electron_1.app.whenReady().then(() => {
             return 'Engine is already running.';
         engine = (0, child_process_1.spawn)(exePath, args);
         engine.stdout.on('data', (data) => {
+            console.log('[ENGINE STDOUT]', data.toString()); // 👈 log it
             win.webContents.send('terminal-output', data.toString());
         });
         engine.stderr.on('data', (data) => {
+            console.log('[ENGINE STDOUT]', data.toString()); // 👈 log it
             win.webContents.send('terminal-output', `[stderr] ${data.toString()}`);
         });
         engine.on('close', (code) => {
@@ -132,6 +134,7 @@ electron_1.app.whenReady().then(() => {
             engine = null;
         });
         engine.on('error', (err) => {
+            console.log('[ENGINE STDOUT]', err.message.toString()); // 👈 log it
             win.webContents.send('terminal-output', `\nError: ${err.message}`);
             engine = null;
         });
@@ -144,6 +147,18 @@ electron_1.app.whenReady().then(() => {
         engine.kill();
         engine = null;
         return 'Engine stopped.';
+    });
+    electron_1.ipcMain.handle('send-to-engine', (_event, input) => {
+        if (engine && !engine.killed) {
+            try {
+                engine.stdin.write(input + '\n');
+                return 'Command sent to engine.';
+            }
+            catch (err) {
+                return 'Failed to send command: ' + err.message;
+            }
+        }
+        return 'Engine is not running.';
     });
 });
 //# sourceMappingURL=main.js.map
