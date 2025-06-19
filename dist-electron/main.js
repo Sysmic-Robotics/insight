@@ -36,13 +36,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const electron_1 = require("electron");
 const path = __importStar(require("path"));
 const fs = __importStar(require("fs"));
+let win; // Ensure this is properly initialized in your scope
 function createWindow() {
-    const win = new electron_1.BrowserWindow({
+    win = new electron_1.BrowserWindow({
         width: 800,
         height: 600,
         resizable: true,
         autoHideMenuBar: true,
-        title: "CondorSSL",
+        title: "Insight CondorSSL",
+        icon: path.join(__dirname, "../src/assets/insightLogo.ico"),
         webPreferences: {
             contextIsolation: true,
             nodeIntegration: false,
@@ -61,7 +63,7 @@ function createWindow() {
     }
 }
 electron_1.app.whenReady().then(createWindow);
-// ✅ Open Lua file
+// Lua management ipc
 electron_1.ipcMain.handle("open-lua-file", async () => {
     const { canceled, filePaths } = await electron_1.dialog.showOpenDialog({
         filters: [{ name: "Lua files", extensions: ["lua"] }],
@@ -110,5 +112,38 @@ electron_1.ipcMain.handle("select-lua-folder", async () => {
 electron_1.ipcMain.handle("read-lua-file", async (_e, filePath) => {
     const content = fs.readFileSync(filePath, "utf-8");
     return { content, path: filePath };
+});
+const child_process_1 = require("child_process");
+let engine = null;
+electron_1.app.whenReady().then(() => {
+    // ✅ Start the engine manually
+    electron_1.ipcMain.handle('start-engine', (_event, exePath, args = []) => {
+        if (engine)
+            return 'Engine is already running.';
+        engine = (0, child_process_1.spawn)(exePath, args);
+        engine.stdout.on('data', (data) => {
+            win.webContents.send('terminal-output', data.toString());
+        });
+        engine.stderr.on('data', (data) => {
+            win.webContents.send('terminal-output', `[stderr] ${data.toString()}`);
+        });
+        engine.on('close', (code) => {
+            win.webContents.send('terminal-output', `\nEngine exited with code ${code}`);
+            engine = null;
+        });
+        engine.on('error', (err) => {
+            win.webContents.send('terminal-output', `\nError: ${err.message}`);
+            engine = null;
+        });
+        return 'Engine started.';
+    });
+    // ✅ Stop the engine manually
+    electron_1.ipcMain.handle('stop-engine', () => {
+        if (!engine)
+            return 'Engine is not running.';
+        engine.kill();
+        engine = null;
+        return 'Engine stopped.';
+    });
 });
 //# sourceMappingURL=main.js.map

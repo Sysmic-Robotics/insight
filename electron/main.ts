@@ -2,8 +2,10 @@ import { app, BrowserWindow, ipcMain, dialog } from "electron";
 import * as path from "path";
 import * as fs from "fs";
 
+let win: BrowserWindow; // Ensure this is properly initialized in your scope
+
 function createWindow() {
-  const win = new BrowserWindow({
+  win = new BrowserWindow({
     width: 800,
     height: 600,
     resizable: true,
@@ -31,7 +33,7 @@ function createWindow() {
 
 app.whenReady().then(createWindow);
 
-// ✅ Open Lua file
+// Lua management ipc
 ipcMain.handle("open-lua-file", async () => {
   const { canceled, filePaths } = await dialog.showOpenDialog({
     filters: [{ name: "Lua files", extensions: ["lua"] }],
@@ -90,4 +92,44 @@ ipcMain.handle("select-lua-folder", async () => {
 ipcMain.handle("read-lua-file", async (_e, filePath: string) => {
   const content = fs.readFileSync(filePath, "utf-8");
   return { content, path: filePath };
+});
+
+import { spawn, ChildProcessWithoutNullStreams } from 'child_process';
+let engine: ChildProcessWithoutNullStreams | null = null;
+app.whenReady().then(() => {
+
+  // ✅ Start the engine manually
+  ipcMain.handle('start-engine', (_event, exePath: string, args: string[] = []) => {
+    if (engine) return 'Engine is already running.';
+
+    engine = spawn(exePath, args);
+
+    engine.stdout.on('data', (data: Buffer) => {
+      win.webContents.send('terminal-output', data.toString());
+    });
+
+    engine.stderr.on('data', (data: Buffer) => {
+      win.webContents.send('terminal-output', `[stderr] ${data.toString()}`);
+    });
+
+    engine.on('close', (code: number) => {
+      win.webContents.send('terminal-output', `\nEngine exited with code ${code}`);
+      engine = null;
+    });
+
+    engine.on('error', (err: Error) => {
+      win.webContents.send('terminal-output', `\nError: ${err.message}`);
+      engine = null;
+    });
+
+    return 'Engine started.';
+  });
+
+  // ✅ Stop the engine manually
+  ipcMain.handle('stop-engine', () => {
+    if (!engine) return 'Engine is not running.';
+    engine.kill();
+    engine = null;
+    return 'Engine stopped.';
+  });
 });

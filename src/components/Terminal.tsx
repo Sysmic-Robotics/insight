@@ -1,22 +1,35 @@
 import React from "react";
 import { Input, Code } from "@heroui/react";
 import { Icon } from "@iconify/react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../store/store";
-import { LogEntry } from "../store/notificationSlice";
+import { addMessage, LogEntry } from "../store/notificationSlice";
 
 const Terminal: React.FC = () => {
   const [command, setCommand] = React.useState("");
   const externalLogs = useSelector((state: RootState) => state.notification.messages);
   const [localLogs, setLocalLogs] = React.useState<LogEntry[]>([]);
   const terminalRef = React.useRef<HTMLDivElement>(null);
+  const dispatch = useDispatch();
 
-  // Whenever logs change, scroll to bottom
+  // Scroll to bottom when logs change
   React.useEffect(() => {
     if (terminalRef.current) {
       terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
     }
   }, [externalLogs, localLogs]);
+
+  // Listen for engine output
+  React.useEffect(() => {
+    window.api.onTerminalOutput((data: string) => {
+      const timestamp = new Date().toLocaleTimeString();
+      dispatch(addMessage({
+        timestamp,
+        type: "info",
+        message: data.trim(),
+      }));
+    });
+  }, [dispatch]);
 
   const handleCommand = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && command.trim()) {
@@ -28,7 +41,7 @@ const Terminal: React.FC = () => {
       };
       setLocalLogs((prev) => [...prev, userInput]);
 
-      // mock response
+      // Mock response logic
       setTimeout(() => {
         let response: LogEntry = {
           timestamp: now,
@@ -65,11 +78,33 @@ const Terminal: React.FC = () => {
     }
   };
 
-  // Merge Redux logs and local logs — both arrays are in chronological order
   const allLogs = [...externalLogs, ...localLogs];
+
+  const startEngine = async () => {
+    const exePath = "C:\\Robocup\\project\\condorssl\\engine\\build\\engine.exe"; // 🔧 Update this
+    const message = await window.api.openEngine(exePath, []);
+    const timestamp = new Date().toLocaleTimeString();
+    dispatch(addMessage({
+      timestamp,
+      type: "success",
+      message: `Engine: ${message}`,
+    }));
+  };
 
   return (
     <div className="flex flex-col h-full">
+      {/* Header */}
+      <div className="flex justify-between items-center p-2 bg-content2 border-b border-divider">
+        <span className="font-mono text-sm text-default-500">Terminal</span>
+        <button
+          className="text-xs px-2 py-1 bg-success-600 text-white rounded hover:bg-success-700"
+          onClick={startEngine}
+        >
+          Start Engine
+        </button>
+      </div>
+
+      {/* Log Display */}
       <div
         ref={terminalRef}
         className="flex-1 overflow-y-auto p-3 pb-14 scroll-pb-14 font-mono text-sm bg-content1"
@@ -81,6 +116,8 @@ const Terminal: React.FC = () => {
           </div>
         ))}
       </div>
+
+      {/* Command Input */}
       <div className="flex-none p-2 border-t border-divider bg-content1 sticky bottom-0 z-10">
         <Input
           fullWidth

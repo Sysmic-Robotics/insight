@@ -89,7 +89,6 @@ function InnerApp() {
         <ConnectionStatus />
         <ThemeToggle />
       </Navbar>
-
       {/* Main Content */}
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}

@@ -1,10 +1,15 @@
-// src/components/TimeSeriesRecorder.tsx
 import React, { useEffect, useRef, useState } from "react";
 import { Select, SelectItem, Button } from "@heroui/react";
 import TimeSeriesPlot from "./TimeSeriesPlot";
 import type { Robot } from "../hooks/useRobotData";
 
-export type FieldKey = "position.x" | "position.y" | "velocity.x" | "velocity.y" | "orientation" | "speed";
+export type FieldKey =
+  | "position.x"
+  | "position.y"
+  | "velocity.x"
+  | "velocity.y"
+  | "orientation"
+  | "speed";
 
 const fieldOptions: { key: FieldKey; label: string }[] = [
   { key: "position.x", label: "Position X" },
@@ -45,6 +50,11 @@ const TimeSeriesRecorder: React.FC<TimeSeriesRecorderProps> = ({
 }) => {
   const [data, setData] = useState<{ time: number; value: number }[]>([]);
   const tickRef = useRef(0);
+  const [fullscreen, setFullscreen] = useState(false);
+  const [position, setPosition] = useState({ x: 100, y: 100 });
+  const panelRef = useRef<HTMLDivElement | null>(null);
+  const dragOffset = useRef({ x: 0, y: 0 });
+  const dragging = useRef(false);
 
   useEffect(() => {
     if (!recording) return;
@@ -52,31 +62,83 @@ const TimeSeriesRecorder: React.FC<TimeSeriesRecorderProps> = ({
     tickRef.current += 1;
     const value = getFieldValue(robot, selectedField);
     setData((prev) => [...prev, { time: tickRef.current, value }]);
-
   }, [robot, selectedField, recording]);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (dragging.current && !fullscreen) {
+        setPosition({
+          x: e.clientX - dragOffset.current.x,
+          y: e.clientY - dragOffset.current.y,
+        });
+      }
+    };
+
+    const handleMouseUp = () => {
+      dragging.current = false;
+    };
+
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [fullscreen]);
+
+  const handleDragStart = (e: React.MouseEvent) => {
+    if (!panelRef.current || fullscreen) return;
+    dragging.current = true;
+
+    const rect = panelRef.current.getBoundingClientRect();
+    dragOffset.current = {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    };
+  };
 
   return (
     <div
+      ref={panelRef}
       style={{
         position: "fixed",
-        top: 100,
-        left: 100,
+        top: fullscreen ? 0 : position.y,
+        left: fullscreen ? 0 : position.x,
+        width: fullscreen ? "100vw" : 600,
+        height: fullscreen ? "100vh" : 500,
         zIndex: 1000,
-        width: 400,
-        maxWidth: "90vw",
+        maxWidth: "100vw",
+        maxHeight: "100vh",
+        cursor: fullscreen ? "default" : "move",
       }}
       className="shadow-lg border border-default-300 bg-content1 rounded-lg overflow-hidden"
     >
-      <div className="cursor-move p-2 bg-default-100 border-b border-divider flex justify-between items-center">
+      {/* Header */}
+      <div
+        className="p-2 bg-default-100 border-b border-divider flex justify-between items-center"
+        onMouseDown={handleDragStart}
+      >
         <span className="text-sm font-medium">Time Series Recorder</span>
-        {onClose && (
-          <Button size="sm" isIconOnly variant="light" onPress={onClose}>
-            ✕
+        <div className="flex gap-2 items-center">
+          <Button
+            size="sm"
+            isIconOnly
+            variant="light"
+            onPress={() => setFullscreen((prev) => !prev)}
+            title={fullscreen ? "Restore" : "Expand"}
+          >
+            {fullscreen ? "🗗" : "🗖"}
           </Button>
-        )}
+          {onClose && (
+            <Button size="sm" isIconOnly variant="light" onPress={onClose}>
+              ✕
+            </Button>
+          )}
+        </div>
       </div>
 
-      <div className="p-3 space-y-4">
+      {/* Body */}
+      <div className="p-3 space-y-4" style={{ height: "calc(100% - 48px)", overflow: "auto" }}>
         <div className="flex items-center justify-between gap-4">
           <Select
             label="Field"
