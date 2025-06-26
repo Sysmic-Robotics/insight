@@ -77,29 +77,10 @@ const Terminal: React.FC = () => {
     }
   };
 
-  const startEngine = async () => {
-    const exePath = "C:\\Robocup\\project\\condorssl\\engine\\build\\engine.exe"; // ✅ Confirm path
-    const message = await window.api.openEngine(exePath, []);
-    const timestamp = new Date().toLocaleTimeString();
-    dispatch(addMessage({
-      timestamp,
-      type: "success",
-      message: `Engine: ${message}`,
-    }));
-  };
+
 
   return (
     <div className="flex flex-col h-full">
-      {/* Header */}
-      <div className="flex justify-between items-center p-2 bg-content2 border-b border-divider">
-        <span className="font-mono text-sm text-default-500">Terminal</span>
-        <button
-          className="text-xs px-2 py-1 bg-success-600 text-white rounded hover:bg-success-700"
-          onClick={startEngine}
-        >
-          Start Engine
-        </button>
-      </div>
 
       {/* Log Output */}
       <div
