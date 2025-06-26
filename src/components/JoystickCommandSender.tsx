@@ -29,7 +29,7 @@ const JoystickCommandSender: React.FC = () => {
 
     useEffect(() => {
         if (!connected || !enabled) return;
-        const id = 2;
+        const id = 0;
         let [lx = 0, ly = 0, rx = 0] = axes;
         lx = applyDeadzone(lx, DEADZONE);
         ly = applyDeadzone(ly, DEADZONE);
