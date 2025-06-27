@@ -21,6 +21,9 @@ const JoystickCommandSender: React.FC = () => {
         omegaScale,
     } = useSelector((state: RootState) => state.gamepad);
 
+    // Get selected robot key from Redux
+    const selectedKey = useSelector((state: RootState) => state.selectedRobot.key);
+
     const sendSocketMessage = (message: object) => {
         if (socket && socket.readyState === WebSocket.OPEN) {
             socket.send(JSON.stringify(message));
@@ -29,7 +32,16 @@ const JoystickCommandSender: React.FC = () => {
 
     useEffect(() => {
         if (!connected || !enabled) return;
-        const id = 0;
+
+        // Parse selected robot id and team from key
+        let id = 0;
+        let team = "blue";
+        if (selectedKey) {
+            const [teamStr, idStr] = selectedKey.split("-");
+            id = Number(idStr);
+            team = teamStr as "blue" | "yellow";
+        }
+
         let [lx = 0, ly = 0, rx = 0] = axes;
         lx = applyDeadzone(lx, DEADZONE);
         ly = applyDeadzone(ly, DEADZONE);
@@ -37,7 +49,7 @@ const JoystickCommandSender: React.FC = () => {
 
         const bPressed = buttons[1] ?? false;
 
-        const robot = robots.find((r) => r.id === id && r.team === "blue");
+        const robot = robots.find((r) => r.id === id && r.team === team);
         const theta = robot?.orientation ?? 0;
 
         const vxGlobal = lx * vxScale;
@@ -50,19 +62,19 @@ const JoystickCommandSender: React.FC = () => {
         const vyLocal = vxGlobal * sinT + vyGlobal * cosT;
 
         const message = {
-        id: id,
-        team: 0,
-        type: "joystickCommand",
-        vx: vxLocal,
-        vy: vyLocal,
-        omega: -rx * omegaScale,
-        kick: bPressed,
-        dribbler: buttons[6] ? 5.0 : 0.0,
+            id: id,
+            team: team === "blue" ? 0 : 1,
+            type: "joystickCommand",
+            vx: vxLocal,
+            vy: vyLocal,
+            omega: -rx * omegaScale,
+            kick: bPressed,
+            dribbler: buttons[6] ? 5.0 : 0.0,
         };
 
         sendSocketMessage(message);
 
-        }, [axes, buttons, connected, enabled, vxScale, vyScale, omegaScale]);
+    }, [axes, buttons, connected, enabled, vxScale, vyScale, omegaScale, robots, selectedKey]);
 
     return null;
 };

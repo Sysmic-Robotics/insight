@@ -3,6 +3,9 @@ import React, { useState, useEffect, useMemo } from "react";
 import { Select, SelectItem, Card, Chip, Button } from "@heroui/react";
 import type { Robot as RobotType } from "../hooks/useRobotData";
 import TimeSeriesRecorder from "./TimeSeriesRecorder";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "../store/store";
+import { setSelectedRobot } from "../store/selectedRobotSlice";
 
 interface RobotDataPanelProps {
   robots: RobotType[];
@@ -15,18 +18,18 @@ const makeKey = (r: RobotType) => `${r.team}-${r.id}`;
 const RobotDataPanel: React.FC<RobotDataPanelProps> = ({ robots }) => {
   const last3 = (value: number) => value.toFixed(3);
 
-  const [selectedKey, setSelectedKey] = useState<string>(
-    robots.length ? makeKey(robots[0]) : ""
-  );
+  const selectedKey = useSelector((state: RootState) => state.selectedRobot.key);
+  const dispatch = useDispatch();
+
   const [showChart, setShowChart] = useState(false);
   const [selectedField, setSelectedField] = useState<FieldKey>("position.x");
   const [recording, setRecording] = useState(false);
 
   useEffect(() => {
     if (!robots.find((r) => makeKey(r) === selectedKey)) {
-      setSelectedKey(robots.length ? makeKey(robots[0]) : "");
+      dispatch(setSelectedRobot(robots.length ? makeKey(robots[0]) : ""));
     }
-  }, [robots, selectedKey]);
+  }, [robots, selectedKey, dispatch]);
 
   const selectedRobot = useMemo(
     () => robots.find((r) => makeKey(r) === selectedKey) || null,
@@ -46,7 +49,7 @@ const RobotDataPanel: React.FC<RobotDataPanelProps> = ({ robots }) => {
         onSelectionChange={(keys) => {
           const raw = Array.from(keys)[0];
           const key = String(raw);
-          setSelectedKey(key);
+          dispatch(setSelectedRobot(key));
         }}
       >
         {robots.map((robot) => (
