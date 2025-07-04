@@ -55,6 +55,7 @@ const RobotDataPanel: React.FC<RobotDataPanelProps> = ({ robots }) => {
         {robots.map((robot) => (
           <SelectItem
             key={makeKey(robot)}
+            textValue={`Robot ${robot.id} (${robot.team})`}  // ✅ Add this line
             startContent={
               <div
                 className={`w-2 h-2 rounded-full mr-2 ${
@@ -71,7 +72,7 @@ const RobotDataPanel: React.FC<RobotDataPanelProps> = ({ robots }) => {
       {/* Details Card */}
       {selectedRobot && (
         <>
-          <Card className="p-4 flex-1 overflow-auto">
+          <Card className="p-4 max-h-max overflow-visible">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-medium">
                 Robot {selectedRobot.id} ({selectedRobot.team})

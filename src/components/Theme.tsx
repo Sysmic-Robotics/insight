@@ -29,8 +29,6 @@ export const ThemeToggle: React.FC = () => {
   return (
     <Button
       size="sm"
-      variant="bordered"
-      className="ml-4"
       onPress={() => setDarkMode(!darkMode)}
       style={{ height: "28px", width: "28px" }}
       title={darkMode ? "Cambiar a Modo Claro" : "Cambiar a Modo Oscuro"}

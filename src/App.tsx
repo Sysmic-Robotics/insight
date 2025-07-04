@@ -82,51 +82,59 @@ function InnerApp() {
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-content1">
       {/* Top Bar */}
       <Navbar maxWidth="full" className="border-b border-divider h-14">
+        <ThemeToggle />
         <NavbarBrand>
           <Icon icon="logos:robot-framework" className="text-2xl mr-2" />
           <p className="font-bold text-inherit">RoboCup SSL Developer</p>
         </NavbarBrand>
         <ConnectionStatus />
-        <ThemeToggle />
+        
       </Navbar>
       {/* Main Content */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar */}
         <Card className="w-80 h-full rounded-none shadow-none border-r border-divider">
-          <div className="flex flex-col h-full">
-            <div className="flex-1 overflow-auto">
-              <div className="p-3 font-medium text-sm flex items-center">
-                <Icon icon="lucide:cpu" className="mr-2" />
-                Robot Data
-              </div>
-              <Divider />
-              <RobotDataPanel robots={robots} />
-            </div>
-            <div className="flex-1 overflow-auto border-t border-divider">
-              <div className="p-3 font-medium text-sm flex items-center justify-between">
-                <div className="flex items-center">
-                  <Icon icon="lucide:folder" className="mr-2" />
-                  File Explorer
-                </div>
-                <Button
-                  size="sm"
-                  variant="flat"
-                  onPress={openFolder}
-                  isIconOnly
-                  aria-label="Open Folder"
-                >
-                  <Icon icon="lucide:folder-open" />
-                </Button>
-              </div>
-              <Divider />
-              <FileExplorer
-                nodes={luaTree}
-                currentFile={currentFile}
-                onOpen={openLuaFile}
-              />
-            </div>
-          </div>
-        </Card>
+  <div className="flex flex-col h-full">
+    
+    {/* Robot Data Panel – Natural height */}
+    <div className="flex-none border-b border-divider">
+      <div className="p-3 font-medium text-sm flex items-center">
+        <Icon icon="lucide:cpu" className="mr-2" />
+        Robot Data
+      </div>
+      <Divider />
+      <RobotDataPanel robots={robots} />
+    </div>
+
+    {/* File Explorer – Fills remaining space */}
+    <div className="flex-1 min-h-0 flex flex-col">
+      <div className="p-3 font-medium text-sm flex items-center justify-between">
+        <div className="flex items-center">
+          <Icon icon="lucide:folder" className="mr-2" />
+          File Explorer
+        </div>
+        <Button
+          size="sm"
+          variant="flat"
+          onPress={openFolder}
+          isIconOnly
+          aria-label="Open Folder"
+        >
+          <Icon icon="lucide:folder-open" />
+        </Button>
+      </div>
+      <Divider />
+      <div className="flex-1 overflow-auto">
+        <FileExplorer
+          nodes={luaTree}
+          currentFile={currentFile}
+          onOpen={openLuaFile}
+        />
+      </div>
+    </div>
+
+  </div>
+</Card>
+
 
         {/* Right Content Area */}
         <div ref={rightRef} className="flex-1 flex flex-col overflow-hidden">
