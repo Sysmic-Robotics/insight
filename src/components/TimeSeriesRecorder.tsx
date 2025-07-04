@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Select, SelectItem, Button } from "@heroui/react";
+import { Button } from "@heroui/react";
 import TimeSeriesPlot from "./TimeSeriesPlot";
 import type { Robot } from "../hooks/useRobotData";
 
@@ -49,47 +49,56 @@ const TimeSeriesRecorder: React.FC<TimeSeriesRecorderProps> = ({
   onClose,
 }) => {
   const [data, setData] = useState<{ time: number; value: number }[]>([]);
+  const [paused, setPaused] = useState(false); // <-- Add paused state
   const tickRef = useRef(0);
-  const [fullscreen, setFullscreen] = useState(false);
-  const [position, setPosition] = useState({ x: 100, y: 100 });
+
+  // Draggable state
+  const [position, setPosition] = useState({ x: window.innerWidth / 2 - 300, y: window.innerHeight / 2 - 250 });
   const panelRef = useRef<HTMLDivElement | null>(null);
-  const dragOffset = useRef({ x: 0, y: 0 });
   const dragging = useRef(false);
+  const dragOffset = useRef({ x: 0, y: 0 });
 
+  // Collect data for the selected field
   useEffect(() => {
-    if (!recording) return;
-
+    if (!recording || paused) return; // <-- Only collect if not paused
     tickRef.current += 1;
-    const value = getFieldValue(robot, selectedField);
-    setData((prev) => [...prev, { time: tickRef.current, value }]);
-  }, [robot, selectedField, recording]);
+    setData((prev) => [
+      ...prev,
+      { time: tickRef.current, value: getFieldValue(robot, selectedField) },
+    ]);
+    // eslint-disable-next-line
+  }, [robot, selectedField, recording, paused]);
 
+  // Reset data when selectedField changes or recording stops
+  useEffect(() => {
+    setData([]);
+    tickRef.current = 0;
+  }, [selectedField, recording]);
+
+  // Drag handlers
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      if (dragging.current && !fullscreen) {
+      if (dragging.current) {
         setPosition({
           x: e.clientX - dragOffset.current.x,
           y: e.clientY - dragOffset.current.y,
         });
       }
     };
-
     const handleMouseUp = () => {
       dragging.current = false;
     };
-
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseup", handleMouseUp);
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
     return () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [fullscreen]);
+  }, []);
 
   const handleDragStart = (e: React.MouseEvent) => {
-    if (!panelRef.current || fullscreen) return;
+    if (!panelRef.current) return;
     dragging.current = true;
-
     const rect = panelRef.current.getBoundingClientRect();
     dragOffset.current = {
       x: e.clientX - rect.left,
@@ -97,77 +106,94 @@ const TimeSeriesRecorder: React.FC<TimeSeriesRecorderProps> = ({
     };
   };
 
+  // Assign a color for each field
+  const fieldColors: Record<FieldKey, string> = {
+    "position.x": "#8884d8",
+    "position.y": "#82ca9d",
+    "velocity.x": "#ff7300",
+    "velocity.y": "#0088FE",
+    "orientation": "#FF69B4",
+    "speed": "#00C49F",
+  };
+
   return (
     <div
-      ref={panelRef}
-      style={{
-        position: "fixed",
-        top: fullscreen ? 0 : position.y,
-        left: fullscreen ? 0 : position.x,
-        width: fullscreen ? "100vw" : 600,
-        height: fullscreen ? "100vh" : 500,
-        zIndex: 1000,
-        maxWidth: "100vw",
-        maxHeight: "100vh",
-        cursor: fullscreen ? "default" : "move",
-      }}
-      className="shadow-lg border border-default-300 bg-content1 rounded-lg overflow-hidden"
+      className="fixed inset-0 z-50"
+      style={{ background: "rgba(0,0,0,0.3)" }}
     >
-      {/* Header */}
       <div
-        className="p-2 bg-default-100 border-b border-divider flex justify-between items-center"
-        onMouseDown={handleDragStart}
+        ref={panelRef}
+        className="shadow-lg border border-default-300 bg-content1 rounded-lg overflow-hidden"
+        style={{
+          width: 800,
+          height: 500,
+          maxWidth: "100vw",
+          maxHeight: "100vh",
+          position: "absolute",
+          left: position.x,
+          top: position.y,
+          cursor: dragging.current ? "move" : "default",
+          display: "flex",
+          flexDirection: "column",
+        }}
       >
-        <span className="text-sm font-medium">Time Series Recorder</span>
-        <div className="flex gap-2 items-center">
-          <Button
-            size="sm"
-            isIconOnly
-            variant="light"
-            onPress={() => setFullscreen((prev) => !prev)}
-            title={fullscreen ? "Restore" : "Expand"}
-          >
-            {fullscreen ? "🗗" : "🗖"}
-          </Button>
-          {onClose && (
-            <Button size="sm" isIconOnly variant="light" onPress={onClose}>
-              ✕
-            </Button>
-          )}
-        </div>
-      </div>
-
-      {/* Body */}
-      <div className="p-3 space-y-4" style={{ height: "calc(100% - 48px)", overflow: "auto" }}>
-        <div className="flex items-center justify-between gap-4">
-          <Select
-            label="Field"
-            selectedKeys={[selectedField]}
-            onSelectionChange={(keys) => {
-              const key = Array.from(keys)[0] as FieldKey;
-              setSelectedField(key);
-              setData([]);
-              tickRef.current = 0;
-            }}
-            className="w-1/2"
-          >
-            {fieldOptions.map((opt) => (
-              <SelectItem key={opt.key}>{opt.label}</SelectItem>
-            ))}
-          </Select>
-
-          <Button
-            onPress={() => setRecording(!recording)}
-            color={recording ? "danger" : "success"}
-          >
-            {recording ? "Stop" : "Start"}
-          </Button>
+        {/* Header */}
+        <div
+          className="p-2 bg-default-100 border-b border-divider flex justify-between items-center select-none"
+          onMouseDown={handleDragStart}
+          style={{ cursor: "move" }}
+        >
+          <span className="text-sm font-medium">Time Series Recorder</span>
+          <div className="flex gap-2 items-center">
+            {onClose && (
+              <Button size="sm" isIconOnly variant="light" onPress={onClose}>
+                ✕
+              </Button>
+            )}
+          </div>
         </div>
 
-        <TimeSeriesPlot
-          data={data}
-          label={fieldOptions.find((f) => f.key === selectedField)?.label || ""}
-        />
+        {/* Body */}
+        <div className="p-3 flex-1 flex flex-col justify-between" style={{ overflow: "hidden" }}>
+          <div className="flex items-center justify-between gap-4 mb-2">
+            <div className="flex flex-wrap gap-3">
+              {fieldOptions.map((opt) => (
+                <label key={opt.key} className="flex items-center gap-1">
+                  <input
+                    type="radio"
+                    name="field"
+                    checked={selectedField === opt.key}
+                    onChange={() => setSelectedField(opt.key)}
+                  />
+                  <span style={{ color: fieldColors[opt.key] }}>{opt.label}</span>
+                </label>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <Button
+                onPress={() => setRecording(!recording)}
+                color={recording ? "danger" : "success"}
+              >
+                {recording ? "Stop" : "Start"}
+              </Button>
+              <Button
+                onPress={() => setPaused((p) => !p)}
+                color={paused ? "success" : "warning"}
+                disabled={!recording}
+              >
+                {paused ? "Resume" : "Pause"}
+              </Button>
+            </div>
+          </div>
+
+          <div style={{ flex: 1, minHeight: 0 }}>
+            <TimeSeriesPlot
+              data={data}
+              label={fieldOptions.find(f => f.key === selectedField)?.label || "Value"}
+              height={undefined} // Let the chart fill the container
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
