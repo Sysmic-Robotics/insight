@@ -311,7 +311,7 @@ const FieldVisualization: React.FC<{ robots?: RobotProps[]; ball?: BallProps | n
       {/* Mouse coordinates */}
       {mouseFieldCoords && (
         <div className="absolute top-4 left-4 bg-black text-white text-xs px-2 py-1 rounded">
-          X: {mouseFieldCoords.x} Y: {mouseFieldCoords.y}
+          X: {mouseFieldCoords.x} Y: {-mouseFieldCoords.y}
         </div>
       )}
 
