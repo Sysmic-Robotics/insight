@@ -35,84 +35,50 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 const electron_1 = require("electron");
 const path = __importStar(require("path"));
-const fs = __importStar(require("fs"));
-let win; // Ensure this is properly initialized in your scope
+let win;
+let splash;
 function createWindow() {
     win = new electron_1.BrowserWindow({
-        width: 800,
-        height: 600,
+        width: 1200,
+        height: 800,
         resizable: true,
         autoHideMenuBar: true,
         title: "Insight CondorSSL",
         icon: path.join(__dirname, "../src/assets/insightLogo.ico"),
+        show: false, // Don't show the main window yet
         webPreferences: {
             contextIsolation: true,
             nodeIntegration: false,
             preload: path.join(__dirname, "../dist-electron/preload.js"),
         },
     });
+    splash = new electron_1.BrowserWindow({
+        width: 400,
+        height: 300,
+        transparent: true,
+        frame: false,
+        alwaysOnTop: true,
+        icon: path.join(__dirname, "../src/assets/insightLogo.ico"),
+    });
+    splash.loadFile(path.join(__dirname, "splash.html"));
     const isDev = !electron_1.app.isPackaged;
     if (isDev) {
         win.loadURL("http://localhost:5173");
     }
     else {
         win.loadFile(path.join(__dirname, "../dist/index.html"));
-        win.webContents.on("did-fail-load", (_e, code, desc, validatedURL) => {
-            console.error("❌ Page failed to load:", { code, desc, validatedURL });
-        });
     }
+    win.once("ready-to-show", () => {
+        if (splash) {
+            splash.destroy();
+        }
+        win?.show();
+    });
+    win.on("closed", () => {
+        win = null;
+    });
 }
 electron_1.app.whenReady().then(createWindow);
-// Lua management ipc
-electron_1.ipcMain.handle("open-lua-file", async () => {
-    const { canceled, filePaths } = await electron_1.dialog.showOpenDialog({
-        filters: [{ name: "Lua files", extensions: ["lua"] }],
-        properties: ["openFile"]
-    });
-    if (canceled || filePaths.length === 0)
-        return { content: "", path: "" };
-    const path = filePaths[0];
-    const content = fs.readFileSync(path, "utf-8");
-    return { content, path };
-});
-// ✅ Save Lua file
-electron_1.ipcMain.handle("save-lua-file-to-path", async (_event, filePath, content) => {
-    fs.writeFileSync(filePath, content, "utf-8");
-});
-function readFolderRecursive(dir) {
-    const entries = fs.readdirSync(dir, { withFileTypes: true });
-    return entries.map((entry) => {
-        const fullPath = path.join(dir, entry.name);
-        if (entry.isDirectory()) {
-            return {
-                name: entry.name,
-                type: "folder",
-                path: fullPath,
-                children: readFolderRecursive(fullPath)
-            };
-        }
-        else if (entry.isFile() && entry.name.endsWith(".lua")) {
-            return {
-                name: entry.name,
-                type: "file",
-                path: fullPath
-            };
-        }
-    }).filter(Boolean);
-}
-electron_1.ipcMain.handle("select-lua-folder", async () => {
-    const { canceled, filePaths } = await electron_1.dialog.showOpenDialog({
-        properties: ["openDirectory"]
-    });
-    if (canceled || filePaths.length === 0)
-        return [];
-    const tree = readFolderRecursive(filePaths[0]);
-    return tree;
-});
-electron_1.ipcMain.handle("read-lua-file", async (_e, filePath) => {
-    const content = fs.readFileSync(filePath, "utf-8");
-    return { content, path: filePath };
-});
 const child_process_1 = require("child_process");
 let engine = null;
 electron_1.app.whenReady().then(() => {
@@ -122,25 +88,34 @@ electron_1.app.whenReady().then(() => {
             return 'Engine is already running.';
         engine = (0, child_process_1.spawn)(exePath, args);
         engine.stdout.on('data', (data) => {
-            console.log('[ENGINE STDOUT]', data.toString()); // 👈 log it
-            win.webContents.send('terminal-output', data.toString());
+            if (win) {
+                console.log('[ENGINE STDOUT]', data.toString()); // 👈 log it
+                win.webContents.send('terminal-output', data.toString());
+            }
         });
         engine.stderr.on('data', (data) => {
-            console.log('[ENGINE STDOUT]', data.toString()); // 👈 log it
-            win.webContents.send('terminal-output', `[stderr] ${data.toString()}`);
+            if (win) {
+                console.log('[ENGINE STDOUT]', data.toString()); // 👈 log it
+                win.webContents.send('terminal-output', `[stderr] ${data.toString()}`);
+            }
         });
         engine.on('close', (code) => {
-            win.webContents.send('terminal-output', `\nEngine exited with code ${code}`);
+            if (win) {
+                console.log('[ENGINE STDOUT]', `Engine exited with code ${code}`); // 👈 log it
+                win.webContents.send('terminal-output', `\nEngine exited with code ${code}`);
+            }
             engine = null;
         });
         engine.on('error', (err) => {
-            console.log('[ENGINE STDOUT]', err.message.toString()); // 👈 log it
-            win.webContents.send('terminal-output', `\nError: ${err.message}`);
+            if (win) {
+                console.log('[ENGINE STDOUT]', err.message.toString()); // 👈 log it
+                win.webContents.send('terminal-output', `\nError: ${err.message}`);
+            }
             engine = null;
         });
         return 'Engine started.';
     });
-    // ✅ Stop the engine manually
+    // Stop the engine manually
     electron_1.ipcMain.handle('stop-engine', () => {
         if (!engine)
             return 'Engine is not running.';

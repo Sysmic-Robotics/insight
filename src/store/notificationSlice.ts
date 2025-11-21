@@ -1,4 +1,5 @@
-// notificationSlice.ts
+// Messages coming from the engine, like script started.
+
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export interface LogEntry {
@@ -21,6 +22,9 @@ export const notificationSlice = createSlice({
   reducers: {
     addMessage: (state, action: PayloadAction<LogEntry>) => {
       state.messages.push(action.payload);
+      if (state.messages.length > 50) {
+        state.messages.shift(); // Remove the oldest message
+      }
     },
     clearMessages: (state) => {
       state.messages = [];

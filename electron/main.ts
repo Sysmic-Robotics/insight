@@ -79,6 +79,7 @@ app.whenReady().then(() => {
 
     engine.on('close', (code: number) => {
       if (win) {
+        console.log('[ENGINE STDOUT]', `Engine exited with code ${code}`); // 👈 log it
         win.webContents.send('terminal-output', `\nEngine exited with code ${code}`);
       }
       engine = null;

@@ -22,7 +22,7 @@ const StartEngine: React.FC = () => {
         dispatch(addMessage({
           timestamp,
           type: "success",
-          message: `Engine started: ${message}`,
+          message: message,
         }));
         setEngineRunning(true);
 
@@ -36,7 +36,7 @@ const StartEngine: React.FC = () => {
         dispatch(addMessage({
           timestamp,
           type: "warning",
-          message: `Engine stopped: ${message}`,
+          message: message,
         }));
         setEngineRunning(false);
       }
