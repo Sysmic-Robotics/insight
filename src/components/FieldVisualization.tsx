@@ -326,53 +326,6 @@ const FieldVisualization: React.FC<{ robots?: RobotProps[]; ball?: BallProps | n
         <div className="w-8 h-8 bg-default-100 rounded-full flex items-center justify-center cursor-pointer hover:bg-default-200" onClick={resetView}>
           <Icon icon="lucide:refresh-cw" />
         </div>
-        {/* Pencil button */}
-        <div className={`relative`}>
-          <div
-            className={`w-8 h-8 rounded-full flex items-center justify-center cursor-pointer ${drawMenuOpen ? "bg-primary-500 text-white" : "bg-default-100 hover:bg-default-200"}`}
-            onClick={() => setDrawMenuOpen((open) => !open)}
-            title="Drawing Tools"
-          >
-            <Icon icon="lucide:pencil" />
-          </div>
-          {/* Drawing menu - appears above pencil, only when drawMenuOpen is true */}
-          {drawMenuOpen && (
-            <div className="flex flex-col gap-2 absolute bottom-10 right-0 mb-2 z-10">
-              <button
-                className={`w-8 h-8 rounded-full flex items-center justify-center cursor-pointer border ${penMode ? "bg-primary-500 text-white" : "bg-default-100 hover:bg-default-200"}`}
-                onClick={handlePenMode}
-                title="Draw Line"
-              >
-                <Icon icon="lucide:pen-tool" />
-              </button>
-              <button
-                className={`w-8 h-8 rounded-full flex items-center justify-center cursor-pointer border ${freehandMode ? "bg-primary-500 text-white" : "bg-default-100 hover:bg-default-200"}`}
-                onClick={handleFreehandMode}
-                title="Freehand Draw"
-              >
-                <Icon icon="lucide:brush" />
-              </button>
-              <button
-                className={`w-8 h-8 rounded-full flex items-center justify-center cursor-pointer border ${eraserMode ? "bg-primary-500 text-white" : "bg-default-100 hover:bg-default-200"}`}
-                onClick={() => {
-                  setEraserMode((e) => !e);
-                  setPenMode(false);
-                  setFreehandMode(false);
-                }}
-                title="Eraser"
-              >
-                <Icon icon="lucide:eraser" />
-              </button>
-              <button
-                className="w-8 h-8 rounded-full flex items-center justify-center cursor-pointer border bg-danger-500 text-white hover:bg-danger-600"
-                onClick={clearLines}
-                title="Clear all lines"
-              >
-                <Icon icon="lucide:trash" />
-              </button>
-            </div>
-          )}
-        </div>
       </div>
     </div>
   );

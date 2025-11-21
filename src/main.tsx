@@ -6,6 +6,10 @@ import "./index.css";
 import { Provider } from 'react-redux';
 import { store } from './store/store';
 
+// set a black background for the app
+document.body.style.backgroundColor = "#000";
+document.body.style.margin = "0";
+
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

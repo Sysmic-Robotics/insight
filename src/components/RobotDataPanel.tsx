@@ -2,7 +2,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Select, SelectItem, Card, Chip, Button } from "@heroui/react";
 import type { Robot as RobotType } from "../hooks/useRobotData";
-import TimeSeriesRecorder from "./TimeSeriesRecorder";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../store/store";
 import { setSelectedRobot } from "../store/selectedRobotSlice";
@@ -111,26 +110,7 @@ const RobotDataPanel: React.FC<RobotDataPanelProps> = ({ robots }) => {
             </div>
           </Card>
 
-          <div className="mt-3">
-            <Button
-              fullWidth
-              variant="flat"
-              onPress={() => setShowChart((prev) => !prev)}
-            >
-              {showChart ? "Hide Chart" : "Show Chart"}
-            </Button>
-          </div>
 
-          {showChart && selectedRobot && (
-            <TimeSeriesRecorder
-              robot={selectedRobot}
-              recording={recording}
-              setRecording={setRecording}
-              selectedField={selectedField}
-              setSelectedField={setSelectedField}
-              onClose={() => setShowChart(false)}
-            />
-          )}
         </>
       )}
     </div>
