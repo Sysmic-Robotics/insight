@@ -1,8 +1,8 @@
 // src/App.tsx
 import React, { useState, useRef, useEffect } from "react";
-import { Navbar, NavbarBrand, Divider, Card, Button } from "@heroui/react";
+import { Navbar, NavbarBrand, Divider, Card, Button, Tooltip } from "@heroui/react";
 import { Icon } from "@iconify/react";
-import ConnectionStatus from "./components/ConnectionStatus";
+import ConnectionStatus from "./components/StartEngine";
 import RobotDataPanel from "./components/RobotDataPanel";
 import Terminal from "./components/Terminal";
 import { useRobotData } from "./hooks/useRobotData";
@@ -11,7 +11,7 @@ import FieldCodePanel from "./components/FieldCodePanel";
 import { ThemeToggle } from "./components/Theme";
 import { useGamepadPolling } from "./hooks/useGamepadPolling"; // adjust path
 import JoystickCommandSender from "./components/JoystickCommandSender";
-
+import GamepadConfigurator from "./components/GamepadConfigurator";
 
 function InnerApp() {
   const { robots, ball } = useRobotData();
@@ -31,6 +31,35 @@ function InnerApp() {
     }
   }, []);
 
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isResizing || !rightRef.current) return;
+
+      const containerRect = rightRef.current.getBoundingClientRect();
+      const newHeight = containerRect.bottom - e.clientY;
+
+      // Optional: Add constraints for min/max height
+      const minHeight = 100; // e.g., 100px
+      const maxHeight = containerRect.height - 200; // e.g., leave 200px for the top panel
+
+      if (newHeight > minHeight && newHeight < maxHeight) {
+        setTermHeight(newHeight);
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsResizing(false);
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [isResizing]);
+  const [configOpen, setConfigOpen] = useState(false);
 
   return (
     //* Define App Layout *//
@@ -43,6 +72,20 @@ function InnerApp() {
           <Icon icon="logos:robot-framework" className="text-2xl mr-2" />
         </NavbarBrand>
         <ConnectionStatus />
+              {/* Gamepad Configurator Button */}
+      <Tooltip content="Configure Gamepad">
+        <Button
+          isIconOnly
+          size="sm"
+          color="primary"
+          variant="flat"
+          onPress={() => setConfigOpen(true)}
+          aria-label="Configure gamepad"
+        >
+          <Icon icon="lucide:gamepad-2" />
+        </Button>
+      </Tooltip>
+        <GamepadConfigurator isOpen={configOpen} onOpenChange={setConfigOpen} />
       </Navbar>
       {/* Main Content */}
       <div className="flex flex-1 overflow-hidden">
@@ -61,8 +104,6 @@ function InnerApp() {
 
   </div>
 </Card>
-
-
         {/* Right Content Area */}
         <div ref={rightRef} className="flex-1 flex flex-col overflow-hidden">
           <FieldCodePanel

@@ -4,11 +4,11 @@ import { Icon } from "@iconify/react";
 import { useDispatch } from "react-redux";
 import { addMessage } from "../store/notificationSlice";
 import { useBackendSocketContext } from "../context/BackendSocketContext";
-import GamepadConfigurator from "./GamepadConfigurator";
 
-const ConnectionStatus: React.FC = () => {
+
+const StartEngine: React.FC = () => {
   const { connected, connect } = useBackendSocketContext();
-  const [configOpen, setConfigOpen] = useState(false);
+  
   const [engineRunning, setEngineRunning] = useState(false);
   const dispatch = useDispatch();
 
@@ -58,43 +58,24 @@ const ConnectionStatus: React.FC = () => {
             connected ? "bg-success-500" : "bg-danger-500"
           }`}
         />
-        <span className="text-sm">
-          {connected ? "Connected to Backend" : "Disconnected"}
-        </span>
       </div>
 
       {/* Toggle Engine Button */}
       <Tooltip content={engineRunning ? "Stop Engine" : "Start Engine"}>
         <Button
-          isIconOnly
           size="sm"
           color={engineRunning ? "danger" : "success"}
           variant="flat"
           onPress={toggleEngine}
           aria-label={engineRunning ? "Stop engine" : "Start engine"}
         >
-          <Icon icon={engineRunning ? "lucide:circle-off" : "lucide:rocket"} />
+          <Icon icon={engineRunning ? "lucide:power-off" : "lucide:rocket"} />
+          {engineRunning ? "Stop Engine" : "Start Engine"}
         </Button>
       </Tooltip>
-
-      {/* Gamepad Configurator Button */}
-      <Tooltip content="Configure Gamepad">
-        <Button
-          isIconOnly
-          size="sm"
-          color="primary"
-          variant="flat"
-          onPress={() => setConfigOpen(true)}
-          aria-label="Configure gamepad"
-        >
-          <Icon icon="lucide:gamepad-2" />
-        </Button>
-      </Tooltip>
-
-      {/* Gamepad Modal */}
-      <GamepadConfigurator isOpen={configOpen} onOpenChange={setConfigOpen} />
+      
     </div>
   );
 };
 
-export default ConnectionStatus;
+export default StartEngine;
