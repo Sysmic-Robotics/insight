@@ -13,8 +13,6 @@ import { useGamepadPolling } from "./hooks/useGamepadPolling"; // adjust path
 import JoystickCommandSender from "./components/JoystickCommandSender";
 
 
-const MIN_TERMINAL_HEIGHT = 100; // px
-
 function InnerApp() {
   const { robots, ball } = useRobotData();
   useGamepadPolling(); // starts polling on app load
@@ -33,37 +31,18 @@ function InnerApp() {
     }
   }, []);
 
-  // Global mouse handlers for dragging
-  useEffect(() => {
-    const onMouseMove = (e: MouseEvent) => {
-      if (!isResizing || !rightRef.current) return;
-      const { bottom } = rightRef.current.getBoundingClientRect();
-      const newHeight = bottom - e.clientY;
-      if (newHeight > MIN_TERMINAL_HEIGHT) {
-        setTermHeight(newHeight);
-      }
-    };
-    const onMouseUp = () => setIsResizing(false);
-
-    window.addEventListener("mousemove", onMouseMove);
-    window.addEventListener("mouseup", onMouseUp);
-    return () => {
-      window.removeEventListener("mousemove", onMouseMove);
-      window.removeEventListener("mouseup", onMouseUp);
-    };
-  }, [isResizing]);
 
   return (
+    //* Define App Layout *//
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-content1">
       {/* Top Bar */}
       <Navbar maxWidth="full" className="border-b border-divider h-14">
         <ThemeToggle />
         <NavbarBrand>
+          CondorSSL
           <Icon icon="logos:robot-framework" className="text-2xl mr-2" />
-          <p className="font-bold text-inherit">RoboCup SSL Developer</p>
         </NavbarBrand>
         <ConnectionStatus />
-        
       </Navbar>
       {/* Main Content */}
       <div className="flex flex-1 overflow-hidden">
